@@ -9,10 +9,12 @@ using UnityEngine.UI;
 using System.Collections;
 using System.Collections.Generic; 
 
+//[ExecuteInEditMode]
 public class WorldGenerator : MonoBehaviour 
 {
     public GameObject renderObject;
     public Texture2D fill;
+    public GameObject[,] grid = new GameObject[150,75];
 
     private RenderTexture renderTarget;
     private int mapWidth = 150;
@@ -22,14 +24,22 @@ public class WorldGenerator : MonoBehaviour
     {
         InitialiseTextureUpdater();
 
-        for (int x = 0; x < mapWidth; x++)
+        for (int x = 0; x <= mapWidth; x++)
         {
-            for (int y = 0; y < mapHeight; y++)
+            for (int y = 0; y <= mapHeight; y++)
             {
                 DrawTexture(x * 32, (mapHeight - y) * 32, fill);
+
+
+                GameObject gridElement = new GameObject();
+                gridElement.AddComponent<GridElement>();
+                gridElement.name = x + " - " + y;
+
+                gridElement.transform.position = new Vector2(x, y);
+                gridElement.transform.parent = this.transform;
             }            
         }
-	}
+    }
 
     public void InitialiseTextureUpdater()
     {
@@ -38,8 +48,6 @@ public class WorldGenerator : MonoBehaviour
         //renderTarget.name = "map";
 
         renderObject.GetComponent<RawImage>().texture = renderTarget;
-
-        //Graphics.SetRenderTarget(renderTarget); 
     }
 
     public void DrawTexture(int x, int y, Texture2D texture)
