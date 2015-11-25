@@ -9,5 +9,6 @@ using System.Collections;
 
 public class GridElement : MonoBehaviour 
 {	
-
+    public Node m_node = null;
+    public Vector2 m_pos = Vector2.zero;
 }

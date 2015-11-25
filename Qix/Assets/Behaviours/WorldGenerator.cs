@@ -12,31 +12,73 @@ using System.Collections.Generic;
 //[ExecuteInEditMode]
 public class WorldGenerator : MonoBehaviour 
 {
+    public static WorldGenerator Instance;
+
     public GameObject renderObject;
     public Texture2D fill;
-    public GameObject[,] grid = new GameObject[150,75];
+    public GridElement[,] grid = new GridElement[150,75];
 
     private RenderTexture renderTarget;
     private int mapWidth = 150;
     private int mapHeight = 75;
+    
 
-	void Start () 
+	void Awake ()
     {
+        Instance = this;
         InitialiseTextureUpdater();
 
-        for (int x = 0; x <= mapWidth; x++)
+        for (int x = 0; x < mapWidth; x++)
         {
-            for (int y = 0; y <= mapHeight; y++)
+            for (int y = 0; y < mapHeight; y++)
             {
                 DrawTexture(x * 32, (mapHeight - y) * 32, fill);
+                
+                GridElement gridElement = new GridElement();
+                //gridElement.name = x + " - " + y;
 
-
-                GameObject gridElement = new GameObject();
-                gridElement.AddComponent<GridElement>();
-                gridElement.name = x + " - " + y;
-
-                gridElement.transform.position = new Vector2(x, y);
-                gridElement.transform.parent = this.transform;
+                gridElement.m_pos = new Vector2(x, y);
+                gridElement.m_node = new Node();
+                gridElement.m_node.position = new Vector3(x, y, 0);
+                if(x == 0 || x == mapWidth-1)
+                {
+                    gridElement.m_node.directions[0] = true;
+                    gridElement.m_node.directions[2] = true;
+                }
+                if (y == 0 || y == mapHeight-1)
+                {
+                    gridElement.m_node.directions[1] = true;
+                    gridElement.m_node.directions[3] = true;
+                }
+                if (x == 0 && y == 0)
+                {
+                    gridElement.m_node.directions[0] = true;
+                    gridElement.m_node.directions[1] = true;
+                    gridElement.m_node.directions[2] = false;
+                    gridElement.m_node.directions[3] = false;
+                }
+                if (x == mapWidth - 1 && y == 0)
+                {
+                    gridElement.m_node.directions[0] = true;
+                    gridElement.m_node.directions[1] = false;
+                    gridElement.m_node.directions[2] = false;
+                    gridElement.m_node.directions[3] = true;
+                }
+                if (x == 0 && y == mapHeight - 1)
+                {
+                    gridElement.m_node.directions[0] = false;
+                    gridElement.m_node.directions[1] = true;
+                    gridElement.m_node.directions[2] = true;
+                    gridElement.m_node.directions[3] = false;
+                }
+                if (x == mapWidth - 1 && y == mapHeight - 1)
+                {
+                    gridElement.m_node.directions[0] = false;
+                    gridElement.m_node.directions[1] = false;
+                    gridElement.m_node.directions[2] = true;
+                    gridElement.m_node.directions[3] = true;
+                }
+                grid[x, y] = gridElement;
             }            
         }
     }
