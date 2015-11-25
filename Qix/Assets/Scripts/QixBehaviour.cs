@@ -4,11 +4,11 @@ using System.Collections;
 public class QixBehaviour : MonoBehaviour
 {
 	Vector3 destination, desiredScale;
-	float rotTimer, rotation, gridSizeX = 10f, gridSizeY = 10f, startMoveTime, speed, scaleSpeed, journeyDistance, scaleDiff, startScaleTime;
+	float rotTimer, rotation, startMoveTime, journeyDistance, scaleDiff, startScaleTime;
 	bool newDestination, newScale, rotDirection;
+	
+	public float maxRotTime = 1f, maxScale = 3f, speed = 1f, scaleSpeed = 0.1f, gridSizeX = 10f, gridSizeY = 10f;
 
-	//The max time that the rotation will continue for in any direction before a regen
-	public float maxRotTime = 1f, maxScale = 3f;
 
 	void Start ()
 	{
@@ -16,7 +16,6 @@ public class QixBehaviour : MonoBehaviour
 		destination = new Vector3 (RandomFloat (-(gridSizeX / 2), gridSizeX / 2), RandomFloat(-(gridSizeY / 2), gridSizeY / 2), 0f);
 		journeyDistance = Vector3.Distance (transform.position, destination);
 		startMoveTime = Time.time;
-		speed = 1f;
 
 		//generate initial rotation (false = anticlockwise, true = clockwise)
 		rotTimer = RandomFloat(0f, maxRotTime);
@@ -33,7 +32,6 @@ public class QixBehaviour : MonoBehaviour
 		desiredScale = new Vector3 (RandomFloat (0.5f, maxScale), RandomFloat(0.5f, maxScale), 0f);
 		scaleDiff = Vector3.Distance (transform.localScale, desiredScale);
 		startScaleTime = Time.time;
-		scaleSpeed = 0.1f;
 	}
 
 	void Update ()
@@ -77,7 +75,7 @@ public class QixBehaviour : MonoBehaviour
 		ToDestination ();
 
 		//scale
-		//Scale ();
+		Scale ();
 	}
 
 	float RandomFloat (float _min, float _max)
@@ -119,7 +117,7 @@ public class QixBehaviour : MonoBehaviour
 	{
 		float scalingDone = (Time.time - startScaleTime) * scaleSpeed;
 		float fracJourney = scalingDone / scaleDiff;
-		transform.position = Vector3.Lerp (transform.localScale, desiredScale, fracJourney);
+		transform.localScale = Vector3.Lerp (transform.localScale, desiredScale, fracJourney);
 		
 		//once the Qix is acceptably close
 		if (Vector3.Distance(transform.localScale, desiredScale) <= 0.1f)
