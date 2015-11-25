@@ -74,12 +74,11 @@ public class CharMovement : MonoBehaviour
 
     void hitNode(node inputNode)
     {
-        //What are the connecting nodes
+        //Set valid directions to node data
         validUp = inputNode.directions[0];
         validRight = inputNode.directions[1];
         validDown = inputNode.directions[2];
         validLeft = inputNode.directions[3];
-
     }
 
     // Update is called once per frame
@@ -94,7 +93,6 @@ public class CharMovement : MonoBehaviour
         //Check if current tile is node
         for (int i = 0; i < allTheNodes.Count; i++)
         {
-            
             if (transform.position == allTheNodes[i].position)
             {
                 hitNode(allTheNodes[i]);
@@ -107,6 +105,7 @@ public class CharMovement : MonoBehaviour
             {
                 //if vertical movement then allow movement
                 transform.Translate(0, 1 * moveSpeed, 0);
+                //Disable movement for going off the line, but allow us to move back along it.
                 validLeft = false;
                 validRight = false;
                 validDown = true;
