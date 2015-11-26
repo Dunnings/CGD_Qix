@@ -6,7 +6,7 @@ using XInputDotNetPure;
 public static class InputManager
 {
     static bool playerIndexSet = false;
-    static List<PlayerIndex> _indexOfControllers = new List<PlayerIndex>();
+    public static List<PlayerIndex> _indexOfControllers = new List<PlayerIndex>();
     static private int currentController = 0;
     static GamePadState state;
     static GamePadState prevState;
@@ -36,32 +36,28 @@ public static class InputManager
         }
     }
 
-    public static void SetUpPlayers()
-    {
-        if (currentController <= _indexOfControllers.Count-1)
+    public static bool SetUpPlayers(int playerIndex, GamePadState prevState, GamePadState state)
+    {      
+        //the player divisible by two - assume left hand side of controller
+        if (playerIndex % 2 == 0)
         {
-            //set the states of the current index controller
-            prevState = state;
-            state = GamePad.GetState(_indexOfControllers[currentController]);
-
-            //the player divisible by two - assume left hand side of controller
-            if (currentController % 2 == 0)
+            if (prevState.Buttons.Back == ButtonState.Released && state.Buttons.Back == ButtonState.Pressed)
             {
-                if (prevState.Buttons.Back == ButtonState.Released && state.Buttons.Back == ButtonState.Pressed)
-                {
-                    Debug.Log(string.Format("Player {0} Connected", currentController));
-                    currentController++;
-                }
-            }
-            else
-            {
-                if (prevState.Buttons.Start == ButtonState.Released && state.Buttons.Start == ButtonState.Pressed)
-                {
-                    Debug.Log(string.Format("Player {0} Connected", currentController));
-                    currentController++;
-                }
+                Debug.Log(string.Format("Player {0} Connected", playerIndex));
+                return true;
+                
             }
         }
+        else 
+        {
+            if (prevState.Buttons.Start == ButtonState.Released && state.Buttons.Start == ButtonState.Pressed)
+            {
+                Debug.Log(string.Format("Player {0} Connected", playerIndex));
+                return true;
+                
+            }
+        }
+        return false;       
     }
 
     /// <summary>

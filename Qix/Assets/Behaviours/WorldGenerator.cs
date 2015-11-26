@@ -26,8 +26,6 @@ public class WorldGenerator : MonoBehaviour
     
 	void Awake ()
     {
-        InputManager.GetControllers();
-
         Instance = this;
         InitialiseTextureUpdater();
 
@@ -35,7 +33,6 @@ public class WorldGenerator : MonoBehaviour
         {
             for (int y = 0; y < mapHeight; y++)
             {
-                
                 GridElement gridElement = new GridElement();
                 //gridElement.name = x + " - " + y;
 
