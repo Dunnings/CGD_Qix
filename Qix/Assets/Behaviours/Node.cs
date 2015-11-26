@@ -4,6 +4,13 @@ using System.Collections.Generic;
 
 // Created by David Dunnings
 
+public enum NodeState
+{
+    active,
+    construction,
+    inactive
+}
+
 public class Node
 {
     public Vector3 position;
@@ -12,4 +19,5 @@ public class Node
     //2 = down
     //3 = left
     public bool[] directions = new bool[4];
+    public NodeState state = NodeState.inactive;
 }

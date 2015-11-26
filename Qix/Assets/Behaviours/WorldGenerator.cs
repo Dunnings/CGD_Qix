@@ -15,7 +15,9 @@ public class WorldGenerator : MonoBehaviour
     public static WorldGenerator Instance;
 
     public GameObject renderObject;
-    public Texture2D fill;
+    public Texture2D blank;
+    public Texture2D white;
+    public Texture2D construction;
     public GridElement[,] grid = new GridElement[150,75];
 
     private RenderTexture renderTarget;
@@ -32,7 +34,6 @@ public class WorldGenerator : MonoBehaviour
         {
             for (int y = 0; y < mapHeight; y++)
             {
-                DrawTexture(x * 32, (mapHeight - y) * 32, fill);
                 
                 GridElement gridElement = new GridElement();
                 //gridElement.name = x + " - " + y;
@@ -44,20 +45,22 @@ public class WorldGenerator : MonoBehaviour
                 {
                     gridElement.m_node.directions[0] = true;
                     gridElement.m_node.directions[2] = true;
+                    gridElement.m_node.state = NodeState.active;
                 }
-                if (y == 0 || y == mapHeight-1)
+                if (y == 1 || y == mapHeight-1)
                 {
                     gridElement.m_node.directions[1] = true;
                     gridElement.m_node.directions[3] = true;
+                    gridElement.m_node.state = NodeState.active;
                 }
-                if (x == 0 && y == 0)
+                if (x == 0 && y == 1)
                 {
                     gridElement.m_node.directions[0] = true;
                     gridElement.m_node.directions[1] = true;
                     gridElement.m_node.directions[2] = false;
                     gridElement.m_node.directions[3] = false;
                 }
-                if (x == mapWidth - 1 && y == 0)
+                if (x == mapWidth - 1 && y == 1)
                 {
                     gridElement.m_node.directions[0] = true;
                     gridElement.m_node.directions[1] = false;
@@ -79,6 +82,16 @@ public class WorldGenerator : MonoBehaviour
                     gridElement.m_node.directions[3] = true;
                 }
                 grid[x, y] = gridElement;
+
+                if (gridElement.m_node.state == NodeState.active)
+                {
+
+                    DrawTexture(x * 32, (mapHeight - y) * 32, white);
+                }
+                else
+                {
+                    DrawTexture(x * 32, (mapHeight - y) * 32, blank);
+                }
             }            
         }
     }
@@ -101,6 +114,14 @@ public class WorldGenerator : MonoBehaviour
         Graphics.DrawTexture(new Rect(x, y, texture.width, texture.height), texture);
         GL.PopMatrix();
         Graphics.SetRenderTarget(null);
-    } 
+    }
 
+    public void PaintConstruction(int x, int y)
+    {
+        DrawTexture(x * 32, (mapHeight - y) * 32, construction);
+    }
+    public void PaintActive(int x, int y)
+    {
+        DrawTexture(x * 32, (mapHeight - y) * 32, white);
+    }
 }
