@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using XInputDotNetPure;
 using System.Collections.Generic;
 
 public class CharMovement : MonoBehaviour
@@ -9,12 +10,18 @@ public class CharMovement : MonoBehaviour
     List<Node> allTheNodes = new List<Node>();
     public GameObject nodeMarker;
     public bool validUp, validDown, validLeft, validRight;
+    GamePadState state;
+    GamePadState prevState;
+    public int playerIndex = 0;
+    public int controllerIndex = 0;
 
     Node previousNode;
 
     void Start()
     {
         hitNode(WorldGenerator.Instance.grid[0, 0].m_node);
+
+        
     }
 
     void hitNode(Node inputNode)
@@ -33,11 +40,14 @@ public class CharMovement : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        prevState = state;
+        state = GamePad.GetState(InputManager.GetState(controllerIndex));
+
         if (Input.GetKeyDown(KeyCode.Space))
         {
         }
         //If we're on a node, and we can move somewhere else
-        //If a button is pressed to move in the diection of the existing line
+        //If a button is pressed to move in the direction of the existing line
         //Set the current line to the one we should be moving down
 
 
@@ -51,8 +61,8 @@ public class CharMovement : MonoBehaviour
         //    }
         //}
 
-        if (Input.GetKey(KeyCode.W))
-        {
+        if (InputManager.UpHeld(playerIndex, prevState, state))
+        {            
             if (validUp)
             {
                 //if vertical movement then allow movement
@@ -62,17 +72,20 @@ public class CharMovement : MonoBehaviour
                 validDown = true;
             }
         }
-        if (Input.GetKey(KeyCode.S))
+
+
+        if (InputManager.DownHeld(playerIndex, prevState, state))
         {
             if (validDown)
-            { 
+            {
                 transform.Translate(0, -1 * moveSpeed, 0);
                 validLeft = false;
                 validRight = false;
                 validUp = true;
             }
         }
-        if (Input.GetKey(KeyCode.A))
+
+        if (InputManager.LeftHeld(playerIndex, prevState, state))
         {
             if (validLeft)
             {
@@ -82,7 +95,7 @@ public class CharMovement : MonoBehaviour
                 validRight = true;
             }
         }
-        if (Input.GetKey(KeyCode.D))
+        if (InputManager.RightHeld(playerIndex, prevState, state))
         {
             if (validRight)
             {
