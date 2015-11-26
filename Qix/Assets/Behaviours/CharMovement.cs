@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using XInputDotNetPure;
 using System.Collections.Generic;
 
 public class CharMovement : MonoBehaviour
@@ -9,6 +10,10 @@ public class CharMovement : MonoBehaviour
     List<Node> allTheNodes = new List<Node>();
     public GameObject nodeMarker;
     public bool validUp, validDown, validLeft, validRight;
+    GamePadState state;
+    GamePadState prevState;
+    public int playerIndex = 0;
+    public int controllerIndex = 0;
 
     Node previousNode;
 
@@ -44,6 +49,8 @@ public class CharMovement : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        prevState = state;
+        state = GamePad.GetState(InputManager.GetState(controllerIndex));
         //If we're on a node, and we can move somewhere else
         //If a button is pressed to move in the diection of the existing line
         //Set the current line to the one we should be moving down
@@ -105,7 +112,8 @@ public class CharMovement : MonoBehaviour
             constructionPath.Clear();
         }
 
-        if (Input.GetKey(KeyCode.W))
+        if (InputManager.UpHeld(playerIndex, prevState, state) ||
+            Input.GetKey(KeyCode.W))
         {
             if (validUp)
             {
@@ -124,7 +132,8 @@ public class CharMovement : MonoBehaviour
                 validDown = false;
             }
         }
-        if (Input.GetKey(KeyCode.S))
+        if (InputManager.DownHeld(playerIndex, prevState, state) ||
+            Input.GetKey(KeyCode.S))
         {
             if (validDown)
             { 
@@ -142,7 +151,8 @@ public class CharMovement : MonoBehaviour
                 validUp = false;
             }
         }
-        if (Input.GetKey(KeyCode.A))
+        if (InputManager.LeftHeld(playerIndex, prevState, state) 
+            ||Input.GetKey(KeyCode.A))
         {
             if (validLeft)
             {
@@ -160,7 +170,8 @@ public class CharMovement : MonoBehaviour
                 validUp = true;
             }
         }
-        if (Input.GetKey(KeyCode.D))
+        if (InputManager.RightHeld(playerIndex, prevState, state) 
+            || Input.GetKey(KeyCode.D))
         {
             if (validRight)
             {
