@@ -78,7 +78,6 @@ public class CharMovement : MonoBehaviour
                         //Moved left
                         constructionPath[i - 1].directions[3] = true;
                         constructionPath[i].directions[1] = true;
-                        Debug.Log(constructionPath[i].position.x + " " + constructionPath[i].position.y);
                     }
                     else if (constructionPath[i - 1].position.x < constructionPath[i].position.x)
                     {
@@ -101,6 +100,45 @@ public class CharMovement : MonoBehaviour
                 }
                 
                 WorldGenerator.Instance.PaintActive((int)constructionPath[i].position.x, (int)constructionPath[i].position.y);
+            }
+            int x1 = 0;
+            int x2 = 0;
+            int y1 = 0;
+            int y2 = 0;
+            bool fill = false;
+            for (int i = 1; i < constructionPath.Count-1; i++)
+            {
+                if (constructionPath[constructionPath.Count - 1].directions[0])
+                {
+                    if (WorldGenerator.Instance.grid[(int)constructionPath[i].position.x - 1, (int)constructionPath[i].position.y].m_node.state == NodeState.active || WorldGenerator.Instance.grid[(int)constructionPath[i].position.x + 1, (int)constructionPath[i].position.y].m_node.state == NodeState.active)
+                    {
+                        continue;
+                    }
+
+                    //We need to go left and right of x-1 
+                    x1 = (int)constructionPath[i].position.x - 1;
+                    y1 = (int)constructionPath[i].position.y;
+                    x2 = (int)constructionPath[i].position.x + 1;
+                    y2 = (int)constructionPath[i].position.y;
+                    fill = true;
+                }
+                else
+                {
+                    if (WorldGenerator.Instance.grid[(int)constructionPath[i].position.x, (int)constructionPath[i].position.y - 1].m_node.state == NodeState.active || WorldGenerator.Instance.grid[(int)constructionPath[i].position.x, (int)constructionPath[i].position.y + 1].m_node.state == NodeState.active)
+                    {
+                        continue;
+                    }
+                    //We need to go up and down of x-1
+                    x1 = (int)constructionPath[i].position.x;
+                    y1 = (int)constructionPath[i].position.y - 1;
+                    x2 = (int)constructionPath[i].position.x;
+                    y2 = (int)constructionPath[i].position.y + 1;
+                    fill = true;
+                }
+            }
+            if (fill)
+            {
+                StartCoroutine(WorldGenerator.Instance.PaintFill(x1, x2, y1, y2));
             }
             constructionPath.Clear();
         }
