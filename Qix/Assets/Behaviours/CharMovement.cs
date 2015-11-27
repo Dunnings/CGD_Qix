@@ -63,7 +63,7 @@ public class CharMovement : MonoBehaviour
                 break;
             case GameStates.game:
                 //If we're on a node, and we can move somewhere else
-                //If a button is pressed to move in the diection of the existing line
+                //If a button is pressed to move in the direction of the existing line
                 //Set the current line to the one we should be moving down
 
 
@@ -76,7 +76,8 @@ public class CharMovement : MonoBehaviour
                 //        hitNode(allTheNodes[i]);
                 //    }
                 //}
-                if (Input.GetKey(KeyCode.Space))
+                if (InputManager.ActionHeld(playerIndex, prevState, state) ||
+                    Input.GetKey(KeyCode.Space))
                 {
                     drawing = true;
                 }
