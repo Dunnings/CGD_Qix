@@ -19,6 +19,7 @@ public class GameManager : MonoBehaviour
     public GameObject worldCanvas;
     public GameObject uiCanvas;
     public List<GameObject> playerUIElements;
+    public List<GameObject> playerIconUIElements;
     public GameObject menuCreditText;
     public GameObject gameCreditText;
 
@@ -77,8 +78,13 @@ public class GameManager : MonoBehaviour
                         if (_players[i].GetComponent<CharMovement>().alive &&
                             playerUIElements[i].GetComponentInChildren<Image>().color != Color.white)
                         {
-                            //highlight UI
-                            playerUIElements[i].GetComponentInChildren<Image>().color = Color.white;
+                            //get UI element colour
+                            Color get = playerUIElements[i].GetComponentInChildren<Image>().color;
+                            //turn up alpha
+                            get.a = 1.0f;
+                            //set UI element to full alpha
+                            playerUIElements[i].GetComponentInChildren<Image>().color = get;
+
                             creditsInt--;
                             menuCreditText.GetComponent<Text>().text = creditsString + "\n" + creditsInt;
                             gameCreditText.GetComponent<Text>().text = creditsString + "\n" + creditsInt;
@@ -100,6 +106,10 @@ public class GameManager : MonoBehaviour
                         {
                             //set instance inactive if not joined
                             _players[i].SetActive(false);
+                        }
+                        else
+                        {
+                            playerIconUIElements[i].SetActive(true);                  
                         }
                     }
                 }
