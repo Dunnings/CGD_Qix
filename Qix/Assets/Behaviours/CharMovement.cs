@@ -74,7 +74,8 @@ public class CharMovement : MonoBehaviour
                 //        hitNode(allTheNodes[i]);
                 //    }
                 //}
-                if (Input.GetKey(KeyCode.Space))
+                if (InputManager.ActionHeld(playerIndex, prevState, state) ||
+                    Input.GetKey(KeyCode.Space))
                 {
                     drawing = true;
                 }
