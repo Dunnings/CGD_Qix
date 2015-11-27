@@ -22,6 +22,8 @@ public class CharMovement : MonoBehaviour
 
     public bool drawing = false;
 
+    public AudioClip moveSound;
+
     void Start()
     {
         hitNode(WorldGenerator.Instance.grid[0, 0].m_node);
