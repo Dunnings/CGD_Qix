@@ -19,9 +19,8 @@ public class GameManager : MonoBehaviour
     public GameObject worldCanvas;
     public GameObject uiCanvas;
     public List<GameObject> playerUIElements;
-    public GameObject creditText;
-
-    public string credits; 
+    public GameObject menuCreditText;
+    public GameObject gameCreditText;
 
     private string creditsString = "CREDITS";
     private int creditsInt = 64;
@@ -81,7 +80,8 @@ public class GameManager : MonoBehaviour
                             //highlight UI
                             playerUIElements[i].GetComponentInChildren<Image>().color = Color.white;
                             creditsInt--;
-                            creditText.GetComponent<Text>().text = creditsString + "\n" + creditsInt;
+                            menuCreditText.GetComponent<Text>().text = creditsString + "\n" + creditsInt;
+                            gameCreditText.GetComponent<Text>().text = creditsString + "\n" + creditsInt;
                         }
                     }
                 }
@@ -102,16 +102,12 @@ public class GameManager : MonoBehaviour
                             _players[i].SetActive(false);
                         }
                     }
-
-                    //set up credit string for in game ui
-                    credits = creditsString + "\n" + creditsInt;
-
                 }
                 break;
             case GameStates.game:
                 worldCanvas.SetActive(true);
                 menuCanvas.SetActive(false);
-                uiCanvas.SetActive(false);
+                uiCanvas.SetActive(true);
                 break;
             case GameStates.paused:
                 break;
