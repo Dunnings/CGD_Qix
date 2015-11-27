@@ -4,6 +4,8 @@ using System.Collections;
 using System.Collections.Generic;
 
 // Created by David Dunnings
+//...But implemented by Daniel Weston ;p xoxo
+
 public class GameManager : MonoBehaviour
 {
     //singleton reference
@@ -17,10 +19,15 @@ public class GameManager : MonoBehaviour
     public GameObject worldCanvas;
     public GameObject uiCanvas;
     public List<GameObject> playerUIElements;
+    public GameObject creditText;
+
+    public string credits; 
+
+    private string creditsString = "CREDITS";
+    private int creditsInt = 64;
 
     //GameObject references 
-    public GameObject Player;
-    List<GameObject> _players = new List<GameObject>();
+    public List<GameObject> _players = new List<GameObject>();
     
 	void Awake()
     {
@@ -35,18 +42,15 @@ public class GameManager : MonoBehaviour
         {
             //set up player icon in ui
             playerUIElements[i].SetActive(true);
-            //create a new player
-            _players.Add(GameObject.Instantiate(Player, new Vector2(0, 0), Quaternion.identity) as GameObject);          
-               
-            //if i is div by 2 then next controller
-            if(i % 2 == 0 && i != 0)
-            {
-                controlIndex++;
-            }
+
+            _players[i].SetActive(true);     
 
             //set up player and controller indexes
             _players[i].GetComponent<CharMovement>().playerIndex = i;
             _players[i].GetComponent<CharMovement>().controllerIndex = controlIndex;
+
+            controlIndex++;
+           
         }
 
         //set state to menu
@@ -66,11 +70,19 @@ public class GameManager : MonoBehaviour
                 //in char select loop over max amount of active players
                 for (int i = 0; i < _players.Count; i++)
                 {
-                    //if that player has joined
-                    if(_players[i].GetComponent<CharMovement>().alive)
+                    //had to add this check in for otherwise sometime null reference occurs :s
+                    if (_players[i].GetComponent<CharMovement>() == true &&
+                        playerUIElements[i].GetComponentInChildren<Image>() == true)
                     {
-                        //highlight UI
-                        playerUIElements[i].GetComponent<Image>().color = Color.white;
+                        //if that player has joined
+                        if (_players[i].GetComponent<CharMovement>().alive &&
+                            playerUIElements[i].GetComponentInChildren<Image>().color != Color.white)
+                        {
+                            //highlight UI
+                            playerUIElements[i].GetComponentInChildren<Image>().color = Color.white;
+                            creditsInt--;
+                            creditText.GetComponent<Text>().text = creditsString + "\n" + creditsInt;
+                        }
                     }
                 }
 
@@ -83,17 +95,18 @@ public class GameManager : MonoBehaviour
                     //loop over all possible players
                     for (int i = 0; i < _players.Count; i++)
                     {
-                        //if player hasnt joined
+                        //if player hasn't joined
                         if (!_players[i].GetComponent<CharMovement>().alive)
                         {
-                            //destroy instance
-                            GameObject.Destroy(_players[i]);
+                            //set instance inactive if not joined
+                            _players[i].SetActive(false);
                         }
                     }
 
+                    //set up credit string for in game ui
+                    credits = creditsString + "\n" + creditsInt;
+
                 }
-
-
                 break;
             case GameStates.game:
                 worldCanvas.SetActive(true);
