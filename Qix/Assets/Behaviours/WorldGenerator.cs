@@ -24,7 +24,6 @@ public class WorldGenerator : MonoBehaviour
     private int mapWidth = 150;
     private int mapHeight = 75;
     
-
 	void Awake ()
     {
         Instance = this;
@@ -34,7 +33,6 @@ public class WorldGenerator : MonoBehaviour
         {
             for (int y = 0; y < mapHeight; y++)
             {
-                
                 GridElement gridElement = new GridElement();
                 //gridElement.name = x + " - " + y;
 
@@ -96,6 +94,11 @@ public class WorldGenerator : MonoBehaviour
         }
     }
 
+    void Update()
+    {
+        //InputManager.SetUpPlayers();
+    }
+
     public void InitialiseTextureUpdater()
     {
         renderTarget = new RenderTexture(mapWidth * 32, mapHeight * 32, 24, RenderTextureFormat.ARGB32);
@@ -115,7 +118,6 @@ public class WorldGenerator : MonoBehaviour
         GL.PopMatrix();
         Graphics.SetRenderTarget(null);
     }
-
     public void PaintConstruction(int x, int y)
     {
         DrawTexture(x * 32, (mapHeight - y) * 32, construction);
