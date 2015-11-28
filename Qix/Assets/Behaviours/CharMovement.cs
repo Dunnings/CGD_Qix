@@ -7,20 +7,19 @@ public class CharMovement : MonoBehaviour
 {
     public float moveSpeed = 1;
     // Use this for initialization
-    List<Node> allTheNodes = new List<Node>();
+	List<Node> allTheNodes = new List<Node>(), constructionPath = new List<Node>();
     public GameObject nodeMarker;
-    public bool validUp, validDown, validLeft, validRight;
-    GamePadState state;
-    GamePadState prevState;
-    public int playerIndex = 0;
-    public int controllerIndex = 0;
-    public bool alive = false;
+	public bool validUp, validDown, validLeft, validRight, alive = false, drawing = false;
+	public int playerIndex = 0, controllerIndex = 0;
+	GamePadState state, prevState;
+	
+	//Input enum, yum yum
+	enum MoveInput {UP, DOWN, LEFT, RIGHT, NULL};
+	//input stack contains the input(s) currently being held down
+	//it works as a stack and updates once an input toggles (from held to released etc)
+	List<MoveInput> inputStack = new List<MoveInput>();
 
     Node previousNode;
-
-    List<Node> constructionPath = new List<Node>();
-
-    public bool drawing = false;
 
     void Start()
     {
@@ -131,77 +130,61 @@ public class CharMovement : MonoBehaviour
 
                 if (InputManager.UpHeld(playerIndex, prevState, state))
                 {
-                    if (validUp)
-                    {
-                        //if vertical movement then allow movement
-                        transform.Translate(0, 1 * moveSpeed, 0);
-                        validLeft = false;
-                        validRight = false;
-                        validDown = true;
-                    }
-                    else if (drawing)
-                    {
-                        transform.Translate(0, 1 * moveSpeed, 0);
-                        validLeft = true;
-                        validRight = true;
-                        validUp = true;
-                        validDown = false;
-                    }
+					if (!inputStack.Contains(MoveInput.UP))
+				    {
+                		//add to stack
+                		inputStack.Add(MoveInput.UP);
+					}
                 }
+				else //if no longer being held, remove from the list
+				{
+					inputStack.Remove(MoveInput.UP);
+				}
+
+
                 if (InputManager.DownHeld(playerIndex, prevState, state))
                 {
-                    if (validDown)
-                    {
-                        transform.Translate(0, -1 * moveSpeed, 0);
-                        validLeft = false;
-                        validRight = false;
-                        validUp = true;
-                    }
-                    else if (drawing)
-                    {
-                        transform.Translate(0, -1 * moveSpeed, 0);
-                        validLeft = true;
-                        validRight = true;
-                        validDown = true;
-                        validUp = false;
-                    }
-                }
+					if (!inputStack.Contains(MoveInput.DOWN))
+					{
+						//add to stack
+						inputStack.Add(MoveInput.DOWN);
+					}
+				}
+				else //if no longer being held, remove from the list
+				{
+					inputStack.Remove(MoveInput.DOWN);
+				}
+
                 if (InputManager.LeftHeld(playerIndex, prevState, state))
                 {
-                    if (validLeft)
-                    {
-                        transform.Translate(-1 * moveSpeed, 0, 0);
-                        validUp = false;
-                        validDown = false;
-                        validRight = true;
-                    }
-                    else if (drawing)
-                    {
-                        transform.Translate(-1 * moveSpeed, 0, 0);
-                        validLeft = true;
-                        validRight = false;
-                        validDown = true;
-                        validUp = true;
-                    }
+					if (!inputStack.Contains(MoveInput.LEFT))
+					{
+						//add to stack
+						inputStack.Add(MoveInput.LEFT);
+					}
                 }
+				else //if no longer being held, remove from the list
+				{
+					inputStack.Remove(MoveInput.LEFT);
+				}
+
                 if (InputManager.RightHeld(playerIndex, prevState, state))
                 {
-                    if (validRight)
-                    {
-                        transform.Translate(1 * moveSpeed, 0, 0);
-                        validUp = false;
-                        validDown = false;
-                        validLeft = true;
-                    }
-                    else if (drawing)
-                    {
-                        transform.Translate(1 * moveSpeed, 0, 0);
-                        validLeft = true;
-                        validRight = true;
-                        validDown = true;
-                        validUp = false;
-                    }
+					if (!inputStack.Contains(MoveInput.RIGHT))
+					{
+					//add to stack
+					inputStack.Add(MoveInput.RIGHT);         
+					}
                 }
+				else //if no longer being held, remove from the list
+				{
+					inputStack.Remove(MoveInput.RIGHT);
+				}
+
+				//apply the stack in order & only if valid
+				ApplyMoveInput ();
+
+
 
                 if (drawing && constructionPath.Count == 0)
                 {
@@ -238,5 +221,112 @@ public class CharMovement : MonoBehaviour
             default:
                 break;
         }
-    }       
+    }
+
+	//loop through the list of inputs until a valid one is found
+	//when the first valid movement is found, it is applied and then will notapply another movement
+	void ApplyMoveInput ()
+	{
+		for (int i = 0; i < inputStack.Count; i++)
+		{
+			bool breakIt = false;
+
+			switch (inputStack[i])
+			{
+			case MoveInput.UP:
+				if (validUp)
+				{
+					//if vertical movement then allow movement
+					transform.Translate(0, 1 * moveSpeed, 0);
+					validLeft = false;
+					validRight = false;
+					validDown = true;
+
+					breakIt = true;
+				}
+				else if (drawing)
+				{
+					transform.Translate(0, 1 * moveSpeed, 0);
+					validLeft = true;
+					validRight = true;
+					validUp = true;
+					validDown = false;
+
+					breakIt = true;
+				}
+				break;
+			case MoveInput.DOWN:
+				if (validDown)
+				{
+					transform.Translate(0, -1 * moveSpeed, 0);
+					validLeft = false;
+					validRight = false;
+					validUp = true;
+					
+					breakIt = true;
+				}
+				else if (drawing)
+				{
+					transform.Translate(0, -1 * moveSpeed, 0);
+					validLeft = true;
+					validRight = true;
+					validDown = true;
+					validUp = false;
+					
+					breakIt = true;
+				}
+
+				break;
+			case MoveInput.LEFT:
+				if (validLeft)
+				{
+					transform.Translate(-1 * moveSpeed, 0, 0);
+					validUp = false;
+					validDown = false;
+					validRight = true;
+
+					breakIt = true;
+				}
+				else if (drawing)
+				{
+					transform.Translate(-1 * moveSpeed, 0, 0);
+					validLeft = true;
+					validRight = false;
+					validDown = true;
+					validUp = true;
+
+					breakIt = true;
+				}
+
+				break;
+			case MoveInput.RIGHT:
+				if (validRight)
+				{
+					transform.Translate(1 * moveSpeed, 0, 0);
+					validUp = false;
+					validDown = false;
+					validLeft = true;
+					
+					breakIt = true;
+				}
+				else if (drawing)
+				{
+					transform.Translate(1 * moveSpeed, 0, 0);
+					validLeft = true;
+					validRight = true;
+					validDown = true;
+					validUp = false;
+					
+					breakIt = true;
+				}          
+				break;
+			}
+
+			if (breakIt)
+			{
+				break;
+			}
+		}
+
+	}
 }
