@@ -110,8 +110,10 @@ public class GameManager : MonoBehaviour
                     }
                 }
 
-                //space == boot game
-                if(Input.GetKey(KeyCode.Space))
+                //space == boot game and make sure at least one player 
+                //has joined the game
+                if(Input.GetKey(KeyCode.Space)
+                    && creditsInt< 64)
                 {
                     //set game state
                     m_state = GameStates.game;

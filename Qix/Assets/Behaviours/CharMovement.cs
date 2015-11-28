@@ -238,6 +238,5 @@ public class CharMovement : MonoBehaviour
             default:
                 break;
         }
-    }
-       
+    }       
 }
