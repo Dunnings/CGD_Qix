@@ -68,15 +68,22 @@ public static class InputManager
     /// <returns></returns>
     public static bool UpPressed(int playerIndex, GamePadState prevState, GamePadState state)
     {
-        //if player index is divisible by 2 I'm left hand side of the controller
-        if (playerIndex % 2 == 0)
+        if (GameManager.instance.noController)
         {
-            //if button has been pressed return true else false
-            return (prevState.DPad.Up == ButtonState.Released && state.DPad.Up == ButtonState.Pressed);
+            return Input.GetKey(KeyCode.W);
         }
         else
         {
-            return (prevState.Buttons.Y == ButtonState.Released && state.Buttons.Y == ButtonState.Pressed);
+            //if player index is divisible by 2 I'm left hand side of the controller
+            if (playerIndex % 2 == 0)
+            {
+                //if button has been pressed return true else false
+                return (prevState.DPad.Up == ButtonState.Released && state.DPad.Up == ButtonState.Pressed);
+            }
+            else
+            {
+                return (prevState.Buttons.Y == ButtonState.Released && state.Buttons.Y == ButtonState.Pressed);
+            }
         }
     }
 
@@ -208,48 +215,73 @@ public static class InputManager
 
     public static bool UpHeld(int playerIndex, GamePadState prevState, GamePadState state)
     {
-        //if player index is divisible by 2 I'm left hand side of the controller
-        if (playerIndex % 2 == 0)
+        if (GameManager.instance.noController)
         {
-            //if button has been pressed return true else false
-            return (prevState.DPad.Up == ButtonState.Pressed && state.DPad.Up == ButtonState.Pressed);
+            return Input.GetKey(KeyCode.W);
         }
         else
         {
-            return (prevState.Buttons.Y == ButtonState.Pressed && state.Buttons.Y == ButtonState.Pressed);
+            //if player index is divisible by 2 I'm left hand side of the controller
+            if (playerIndex % 2 == 0)
+            {
+                //if button has been pressed return true else false
+                return (prevState.DPad.Up == ButtonState.Pressed && state.DPad.Up == ButtonState.Pressed);
+            }
+            else
+            {
+                return (prevState.Buttons.Y == ButtonState.Pressed && state.Buttons.Y == ButtonState.Pressed);
+            }
         }
     }
 
     public static bool DownHeld(int playerIndex, GamePadState prevState, GamePadState state)
     {
-        //if player index is divisible by 2 I'm left hand side of the controller
-        if (playerIndex % 2 == 0)
+        if (GameManager.instance.noController)
         {
-            //if button has been pressed return true else false
-            return (prevState.DPad.Down == ButtonState.Pressed && state.DPad.Down == ButtonState.Pressed);
+            return Input.GetKey(KeyCode.S);
         }
         else
         {
-            return (prevState.Buttons.A == ButtonState.Pressed && state.Buttons.A == ButtonState.Pressed);
+            //if player index is divisible by 2 I'm left hand side of the controller
+            if (playerIndex % 2 == 0)
+            {
+                //if button has been pressed return true else false
+                return (prevState.DPad.Down == ButtonState.Pressed && state.DPad.Down == ButtonState.Pressed);
+            }
+            else
+            {
+                return (prevState.Buttons.A == ButtonState.Pressed && state.Buttons.A == ButtonState.Pressed);
+            }
         }
     }
 
     public static bool RightHeld(int playerIndex, GamePadState prevState, GamePadState state)
     {
-        //if player index is divisible by 2 I'm left hand side of the controller
-        if (playerIndex % 2 == 0)
+        if (GameManager.instance.noController)
         {
-            //if button has been pressed return true else false
-            return (prevState.DPad.Right == ButtonState.Pressed && state.DPad.Right == ButtonState.Pressed);
+            return Input.GetKey(KeyCode.D);
         }
         else
         {
-            return (prevState.Buttons.B == ButtonState.Pressed && state.Buttons.B == ButtonState.Pressed);
+            //if player index is divisible by 2 I'm left hand side of the controller
+            if (playerIndex % 2 == 0)
+            {
+                //if button has been pressed return true else false
+                return (prevState.DPad.Right == ButtonState.Pressed && state.DPad.Right == ButtonState.Pressed);
+            }
+            else
+            {
+                return (prevState.Buttons.B == ButtonState.Pressed && state.Buttons.B == ButtonState.Pressed);
+            }
         }
     }
 
     public static bool LeftHeld(int playerIndex, GamePadState prevState, GamePadState state)
     {
+        if (GameManager.instance.noController)
+        {
+            return Input.GetKey(KeyCode.A);
+        }
         //if player index is divisible by 2 I'm left hand side of the controller
         if (playerIndex % 2 == 0)
         {
@@ -264,15 +296,22 @@ public static class InputManager
 
     public static bool ActionHeld(int playerIndex, GamePadState prevState, GamePadState state)
     {
-        //if player index is divisible by 2 I'm left hand side of the controller
-        if (playerIndex % 2 == 0)
+        if (GameManager.instance.noController)
         {
-            //if button has been pressed return true else false
-            return (prevState.Buttons.LeftShoulder == ButtonState.Pressed && state.Buttons.LeftShoulder == ButtonState.Pressed);
+            return Input.GetKey(KeyCode.Space);
         }
         else
         {
-            return (prevState.Buttons.RightShoulder == ButtonState.Pressed && state.Buttons.RightShoulder == ButtonState.Pressed);
+            //if player index is divisible by 2 I'm left hand side of the controller
+            if (playerIndex % 2 == 0)
+            {
+                //if button has been pressed return true else false
+                return (prevState.Buttons.LeftShoulder == ButtonState.Pressed && state.Buttons.LeftShoulder == ButtonState.Pressed);
+            }
+            else
+            {
+                return (prevState.Buttons.RightShoulder == ButtonState.Pressed && state.Buttons.RightShoulder == ButtonState.Pressed);
+            }
         }
     }
 
