@@ -114,14 +114,14 @@ public class GameManager : MonoBehaviour
 
                 //space == boot game and make sure at least one player 
                 //has joined the game
-                if(Input.GetKey(KeyCode.Space)
+                if(Input.GetKey(KeyCode.L)
                     && creditsInt< 64)
                 {
                     //set game state
                     m_state = GameStates.game;
 
                     //start music
-                    AudioManager.instance.PlayMusic(music);
+                    //AudioManager.instance.PlayMusic(music);
 
                     //loop over all possible players
                     for (int i = 0; i < _players.Count; i++)

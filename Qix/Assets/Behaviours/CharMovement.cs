@@ -12,6 +12,7 @@ public class CharMovement : MonoBehaviour
 	public bool validUp, validDown, validLeft, validRight, alive = false, drawing = false;
 	public int playerIndex = 0, controllerIndex = 0;
 	GamePadState state, prevState;
+    public List<KeyValuePair<int, int>> axis = new List<KeyValuePair<int, int>>();
 	
 	//Input enum, yum yum
 	enum MoveInput {UP, DOWN, LEFT, RIGHT, NULL};
@@ -87,6 +88,7 @@ public class CharMovement : MonoBehaviour
                 {
                     drawing = true;
                 }
+
                 else if (drawing && previousNode.state == NodeState.active)
                 {
                     //Touched edge
@@ -94,10 +96,13 @@ public class CharMovement : MonoBehaviour
                     constructionPath.Add(previousNode);
                     for (int i = 0; i < constructionPath.Count; i++)
                     {
+                        //perform flood fill
+                        
                         constructionPath[i].state = NodeState.active;
 
                         if (i > 0)
                         {
+                            
                             if (constructionPath[i - 1].position.x > constructionPath[i].position.x)
                             {
                                 //Moved left
@@ -126,7 +131,32 @@ public class CharMovement : MonoBehaviour
                         }
 
                         WorldGenerator.Instance.PaintActive((int)constructionPath[i].position.x, (int)constructionPath[i].position.y);
+                        
                     }
+
+                    //if the end point of the paths y is greater than the starting path pos
+                    if ((int)constructionPath[constructionPath.Count - 1].position.y > (int)constructionPath[0].position.y)
+                    {
+                        //start filling from the 1 path pos up
+                        floodFill((int)constructionPath[1].position.x, (int)constructionPath[1].position.y + 1, 1);
+                    }
+                    //else if the end point of the paths y is less than the starting path pos
+                    else if ((int)constructionPath[constructionPath.Count - 1].position.y < (int)constructionPath[0].position.y)
+                    {
+                        //start filling downwards
+                        floodFill((int)constructionPath[1].position.x, (int)constructionPath[1].position.y - 1, 1);
+                    }
+
+                    else if ((int)constructionPath[constructionPath.Count - 1].position.x > (int)constructionPath[0].position.x)
+                    {
+                        floodFill((int)constructionPath[1].position.x+1, (int)constructionPath[1].position.y, 1);
+                    }
+                    else if ((int)constructionPath[constructionPath.Count - 1].position.y < (int)constructionPath[0].position.x)
+                    {
+                        floodFill((int)constructionPath[1].position.x-1, (int)constructionPath[1].position.y, 1);
+                    }
+                                      
+                    //clear the path 
                     constructionPath.Clear();
                 }
 
@@ -329,4 +359,32 @@ public class CharMovement : MonoBehaviour
 		}
 
 	}
+
+    /// <summary>
+    /// flood fill algorithm
+    /// </summary>
+    /// <param name="x"></param>
+    /// <param name="y"></param>
+    /// <param name="i"></param>
+    void floodFill(int x, int y, int i)
+    {
+        if(x < 0 || x > 149 || y < 0 || y > 74)
+        {
+            return;
+        }
+        if ((WorldGenerator.Instance.grid[x, y].m_node.state == NodeState.active))
+        {
+            return;            
+        }
+        
+        
+        //axis.Add(new KeyValuePair<int, int>(x, y));
+        WorldGenerator.Instance.PaintActive(x,y);
+        WorldGenerator.Instance.grid[x, y].m_node.state = NodeState.active;
+        floodFill(x+1, y,i);
+        floodFill(x-1, y,i);
+        floodFill(x, y+1, i);
+        floodFill(x, y-1, i);
+        
+    }
 }

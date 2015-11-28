@@ -127,7 +127,6 @@ public class WorldGenerator : MonoBehaviour
     public void PaintActive(int x, int y)
     {
         DrawTexture(x * 32, (mapHeight - y) * 32, white);
-        AudioManager.instance.PlaySingle(completeSound);
-        
+        //AudioManager.instance.PlaySingle(completeSound);        
     }
 }
