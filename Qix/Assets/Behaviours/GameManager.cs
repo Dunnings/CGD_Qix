@@ -29,6 +29,8 @@ public class GameManager : MonoBehaviour
 
     //GameObject references 
     public List<GameObject> _players = new List<GameObject>();
+
+    public AudioClip music;
     
 	void Awake()
     {
@@ -117,6 +119,9 @@ public class GameManager : MonoBehaviour
                 {
                     //set game state
                     m_state = GameStates.game;
+
+                    //start music
+                    AudioManager.instance.PlayMusic(music);
 
                     //loop over all possible players
                     for (int i = 0; i < _players.Count; i++)

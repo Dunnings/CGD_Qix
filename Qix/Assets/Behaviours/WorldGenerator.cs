@@ -23,6 +23,8 @@ public class WorldGenerator : MonoBehaviour
     private RenderTexture renderTarget;
     private int mapWidth = 150;
     private int mapHeight = 75;
+
+    public AudioClip completeSound;
     
 	void Awake ()
     {
@@ -125,5 +127,7 @@ public class WorldGenerator : MonoBehaviour
     public void PaintActive(int x, int y)
     {
         DrawTexture(x * 32, (mapHeight - y) * 32, white);
+        AudioManager.instance.PlaySingle(completeSound);
+        
     }
 }
