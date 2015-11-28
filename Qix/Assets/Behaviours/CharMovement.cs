@@ -143,24 +143,7 @@ public class CharMovement : MonoBehaviour
 					inputStack.Remove(MoveInput.UP);
 				}
 
-
-                    if (validUp)
-                    {
-                        //if vertical movement then allow movement
-                        transform.Translate(0, 1 * moveSpeed, 0);
-                        validLeft = false;
-                        validRight = false;
-                        validDown = true;
-                    }
-                    else if (drawing)
-                    {
-                        transform.Translate(0, 1 * moveSpeed, 0);
-                        validLeft = true;
-                        validRight = true;
-                        validUp = true;
-                        validDown = false;
-                    }
-                }
+		
                 if (InputManager.DownHeld(playerIndex, prevState, state))
                 {
 					if (!inputStack.Contains(MoveInput.DOWN))
@@ -173,23 +156,7 @@ public class CharMovement : MonoBehaviour
 				{
 					inputStack.Remove(MoveInput.DOWN);
 				}
-
-                    if (validDown)
-                    {
-                        transform.Translate(0, -1 * moveSpeed, 0);
-                        validLeft = false;
-                        validRight = false;
-                        validUp = true;
-                    }
-                    else if (drawing)
-                    {
-                        transform.Translate(0, -1 * moveSpeed, 0);
-                        validLeft = true;
-                        validRight = true;
-                        validDown = true;
-                        validUp = false;
-                    }
-                }
+		
                 if (InputManager.LeftHeld(playerIndex, prevState, state))
                 {
 					if (!inputStack.Contains(MoveInput.LEFT))
@@ -218,43 +185,6 @@ public class CharMovement : MonoBehaviour
 
 				//apply the stack in order & only if valid
 				ApplyMoveInput ();
-
-
-
-                    if (validLeft)
-                    {
-                        transform.Translate(-1 * moveSpeed, 0, 0);
-                        validUp = false;
-                        validDown = false;
-                        validRight = true;
-                    }
-                    else if (drawing)
-                    {
-                        transform.Translate(-1 * moveSpeed, 0, 0);
-                        validLeft = true;
-                        validRight = false;
-                        validDown = true;
-                        validUp = true;
-                    }
-                }
-                if (InputManager.RightHeld(playerIndex, prevState, state))
-                {
-                    if (validRight)
-                    {
-                        transform.Translate(1 * moveSpeed, 0, 0);
-                        validUp = false;
-                        validDown = false;
-                        validLeft = true;
-                    }
-                    else if (drawing)
-                    {
-                        transform.Translate(1 * moveSpeed, 0, 0);
-                        validLeft = true;
-                        validRight = true;
-                        validDown = true;
-                        validUp = false;
-                    }
-                }
 
                 if (drawing && constructionPath.Count == 0)
                 {
@@ -290,8 +220,8 @@ public class CharMovement : MonoBehaviour
                 break;
             default:
                 break;
-        }
-    }
+		}
+	}
 
 	//loop through the list of inputs until a valid one is found
 	//when the first valid movement is found, it is applied and then will notapply another movement
