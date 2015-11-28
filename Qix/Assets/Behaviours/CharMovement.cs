@@ -14,10 +14,12 @@ public class CharMovement : MonoBehaviour
 	GamePadState state, prevState;
 	
 	//Input enum, yum yum
-	enum MoveInput {UP, DOWN, LEFT, RIGHT, NULL};
+	public enum MoveInput {UP, DOWN, LEFT, RIGHT, NULL};
 	//input stack contains the input(s) currently being held down
 	//it works as a stack and updates once an input toggles (from held to released etc)
 	List<MoveInput> inputStack = new List<MoveInput>();
+
+	public MoveInput lastInput;
 
     Node previousNode;
 
@@ -242,6 +244,11 @@ public class CharMovement : MonoBehaviour
 					validRight = false;
 					validDown = true;
 
+					if (drawing)
+					{
+						AmmendValidInputs ();
+					}
+
 					breakIt = true;
 				}
 				else if (drawing)
@@ -252,6 +259,9 @@ public class CharMovement : MonoBehaviour
 					validUp = true;
 					validDown = false;
 
+					AmmendValidInputs ();
+
+					lastInput = inputStack[i];
 					breakIt = true;
 				}
 				break;
@@ -262,7 +272,12 @@ public class CharMovement : MonoBehaviour
 					validLeft = false;
 					validRight = false;
 					validUp = true;
-					
+
+					if (drawing)
+					{
+						AmmendValidInputs ();
+					}
+
 					breakIt = true;
 				}
 				else if (drawing)
@@ -272,7 +287,10 @@ public class CharMovement : MonoBehaviour
 					validRight = true;
 					validDown = true;
 					validUp = false;
-					
+
+					AmmendValidInputs ();
+
+					lastInput = inputStack[i];
 					breakIt = true;
 				}
 
@@ -285,6 +303,11 @@ public class CharMovement : MonoBehaviour
 					validDown = false;
 					validRight = true;
 
+					if (drawing)
+					{
+						AmmendValidInputs ();
+					}
+
 					breakIt = true;
 				}
 				else if (drawing)
@@ -295,6 +318,9 @@ public class CharMovement : MonoBehaviour
 					validDown = true;
 					validUp = true;
 
+					AmmendValidInputs ();
+
+					lastInput = inputStack[i];
 					breakIt = true;
 				}
 
@@ -306,17 +332,26 @@ public class CharMovement : MonoBehaviour
 					validUp = false;
 					validDown = false;
 					validLeft = true;
-					
+
+					if (drawing)
+					{
+						AmmendValidInputs ();
+					}
+
 					breakIt = true;
 				}
 				else if (drawing)
 				{
 					transform.Translate(1 * moveSpeed, 0, 0);
+
 					validLeft = true;
 					validRight = true;
 					validDown = true;
 					validUp = false;
-					
+
+					AmmendValidInputs ();
+
+					lastInput = inputStack[i];
 					breakIt = true;
 				}          
 				break;
@@ -327,6 +362,25 @@ public class CharMovement : MonoBehaviour
 				break;
 			}
 		}
+	}
 
+	void AmmendValidInputs ()
+	{
+		//ammend valid inputs so that the player cannot go backwards
+		switch (lastInput)
+		{
+		case MoveInput.UP:
+			validDown = false;
+			break;
+		case MoveInput.DOWN:
+			validUp = false;
+			break;
+		case MoveInput.LEFT:
+			validRight = false;
+			break;
+		case MoveInput.RIGHT:
+			validLeft = false;
+			break;
+		}
 	}
 }
