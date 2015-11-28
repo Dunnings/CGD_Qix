@@ -128,5 +128,6 @@ public class WorldGenerator : MonoBehaviour
     {
         DrawTexture(x * 32, (mapHeight - y) * 32, white);
         AudioManager.instance.PlaySingle(completeSound);
+        
     }
 }
