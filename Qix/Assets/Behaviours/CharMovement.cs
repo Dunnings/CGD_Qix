@@ -50,14 +50,21 @@ public class CharMovement : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        prevState = state;
-        state = GamePad.GetState(InputManager.GetState(controllerIndex));
+        if (!GameManager.instance.noController)
+        {
+            prevState = state;
+            state = GamePad.GetState(InputManager.GetState(controllerIndex));
+        }
 
         switch (GameManager.instance.m_state)
         {            
             case GameStates.menu:
-                if(!alive)
-                alive = InputManager.SetUpPlayers(playerIndex, prevState, state);                
+                //if not alive and controllers are connected
+                if (!alive && !GameManager.instance.noController)
+                    alive = InputManager.SetUpPlayers(playerIndex, prevState, state);
+                //else if not alive and keyboard
+                else if (!alive && GameManager.instance.noController)
+                    alive = Input.GetKey(KeyCode.Return);
                 break;
             case GameStates.game:
                 //If we're on a node, and we can move somewhere else
@@ -122,8 +129,7 @@ public class CharMovement : MonoBehaviour
                     constructionPath.Clear();
                 }
 
-                if (InputManager.UpHeld(playerIndex, prevState, state) ||
-                    Input.GetKey(KeyCode.W))
+                if (InputManager.UpHeld(playerIndex, prevState, state))
                 {
                     if (validUp)
                     {
@@ -142,8 +148,7 @@ public class CharMovement : MonoBehaviour
                         validDown = false;
                     }
                 }
-                if (InputManager.DownHeld(playerIndex, prevState, state) ||
-                    Input.GetKey(KeyCode.S))
+                if (InputManager.DownHeld(playerIndex, prevState, state))
                 {
                     if (validDown)
                     {
@@ -161,8 +166,7 @@ public class CharMovement : MonoBehaviour
                         validUp = false;
                     }
                 }
-                if (InputManager.LeftHeld(playerIndex, prevState, state)
-                    || Input.GetKey(KeyCode.A))
+                if (InputManager.LeftHeld(playerIndex, prevState, state))
                 {
                     if (validLeft)
                     {
@@ -180,8 +184,7 @@ public class CharMovement : MonoBehaviour
                         validUp = true;
                     }
                 }
-                if (InputManager.RightHeld(playerIndex, prevState, state)
-                    || Input.GetKey(KeyCode.D))
+                if (InputManager.RightHeld(playerIndex, prevState, state))
                 {
                     if (validRight)
                     {
