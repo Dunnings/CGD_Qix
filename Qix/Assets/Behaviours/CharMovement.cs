@@ -415,7 +415,7 @@ public class CharMovement : MonoBehaviour
 	}
 
     /// <summary>
-    /// flood fill algorithm
+    /// flood fill algorithm called after lines are completed
     /// </summary>
     /// <param name="x"></param>
     /// <param name="y"></param>
