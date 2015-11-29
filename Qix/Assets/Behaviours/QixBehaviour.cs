@@ -7,13 +7,13 @@ public class QixBehaviour : MonoBehaviour
 	float rotTimer, rotation, startMoveTime, journeyDistance, scaleDiff, startScaleTime;
 	bool newDestination, newScale, rotDirection;
 	
-	public float maxRotTime = 1f, maxScale = 3f, speed = 1f, scaleSpeed = 0.1f, gridSizeX = 10f, gridSizeY = 10f;
+	public float maxRotTime = 1f, rotSpeed, maxScale = 3f, minScale, speed = 1f, scaleSpeed = 0.1f, gridXUpper, gridXLower, gridYUpper, gridYLower;
 
 
 	void Start ()
 	{
 		//generate initial destination
-		destination = new Vector3 (RandomFloat (-(gridSizeX / 2), gridSizeX / 2), RandomFloat(-(gridSizeY / 2), gridSizeY / 2), 0f);
+		destination = new Vector3 (RandomFloat (gridXLower, gridXUpper), RandomFloat(gridYLower, gridYUpper), 0f);
 		journeyDistance = Vector3.Distance (transform.position, destination);
 		startMoveTime = Time.time;
 
@@ -29,7 +29,7 @@ public class QixBehaviour : MonoBehaviour
 		}
 
 		//generate desired scale
-		desiredScale = new Vector3 (RandomFloat (0.5f, maxScale), RandomFloat(0.5f, maxScale), 0f);
+		desiredScale = new Vector3 (RandomFloat (minScale, maxScale), transform.localScale.y, 0f);
 		scaleDiff = Vector3.Distance (transform.localScale, desiredScale);
 		startScaleTime = Time.time;
 	}
@@ -39,7 +39,7 @@ public class QixBehaviour : MonoBehaviour
 		//if called to designate a new destination, regen a destination
 		if (newDestination)
 		{
-			destination = new Vector3 (RandomFloat (-(gridSizeX / 2), gridSizeX / 2), RandomFloat (-(gridSizeY / 2), gridSizeY / 2), 0f);
+			destination = new Vector3 (RandomFloat (gridXLower, gridXUpper), RandomFloat (gridYLower, gridYUpper), 0f);
 			journeyDistance = Vector3.Distance (transform.position, destination);
 			startMoveTime = Time.time;
 			newDestination = false;
@@ -49,7 +49,7 @@ public class QixBehaviour : MonoBehaviour
 		if (newScale)
 		{
 			//generate desired scale
-			desiredScale = new Vector3 (RandomFloat (0.5f, maxScale), RandomFloat (0.5f, maxScale), 0f);
+			desiredScale = new Vector3 (RandomFloat (minScale, maxScale), transform.localScale.y, 0f);
 			scaleDiff = Vector3.Distance (transform.localScale, desiredScale);
 			startScaleTime = Time.time;
 			newScale = false;
@@ -133,9 +133,18 @@ public class QixBehaviour : MonoBehaviour
 		{
 			multiplier = -1;
 		}
-		transform.Rotate (transform.forward, 10f * multiplier);
+		transform.Rotate (transform.forward, rotSpeed * multiplier);
 
 		rotTimer -= Time.deltaTime;
+	}
+
+	void OnCollisionEnter (Collision col)
+	{
+		//if collision with the player occurs, disable player for now
+		if (col.gameObject.tag == "Player")
+		{
+			col.gameObject.SetActive(false);
+		}
 	}
 
 }

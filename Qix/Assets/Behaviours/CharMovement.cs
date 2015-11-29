@@ -7,20 +7,24 @@ public class CharMovement : MonoBehaviour
 {
     public float moveSpeed = 1;
     // Use this for initialization
-    List<Node> allTheNodes = new List<Node>();
+	List<Node> allTheNodes = new List<Node>(), constructionPath = new List<Node>();
     public GameObject nodeMarker;
-    public bool validUp, validDown, validLeft, validRight;
-    GamePadState state;
-    GamePadState prevState;
-    public int playerIndex = 0;
-    public int controllerIndex = 0;
-    public bool alive = false;
+	public bool validUp, validDown, validLeft, validRight, alive = false, drawing = false;
+	public int playerIndex = 0, controllerIndex = 0;
+	GamePadState state, prevState;
+    public List<KeyValuePair<int, int>> axis = new List<KeyValuePair<int, int>>();
+	
+	//Input enum, yum yum
+	public enum MoveInput {UP, DOWN, LEFT, RIGHT, NULL};
+	//input stack contains the input(s) currently being held down
+	//it works as a stack and updates once an input toggles (from held to released etc)
+	List<MoveInput> inputStack = new List<MoveInput>();
+
+	public MoveInput lastInput;
 
     Node previousNode;
 
-    List<Node> constructionPath = new List<Node>();
-
-    public bool drawing = false;
+    public AudioClip moveSound;
 
     void Start()
     {
@@ -50,14 +54,21 @@ public class CharMovement : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        prevState = state;
-        state = GamePad.GetState(InputManager.GetState(controllerIndex));
+        if (!GameManager.instance.noController)
+        {
+            prevState = state;
+            state = GamePad.GetState(InputManager.GetState(controllerIndex));
+        }
 
         switch (GameManager.instance.m_state)
         {            
             case GameStates.menu:
-                if(!alive)
-                alive = InputManager.SetUpPlayers(playerIndex, prevState, state);                
+                //if not alive and controllers are connected
+                if (!alive && !GameManager.instance.noController)
+                    alive = InputManager.SetUpPlayers(playerIndex, prevState, state);
+                //else if not alive and keyboard
+                else if (!alive && GameManager.instance.noController)
+                    alive = Input.GetKey(KeyCode.Return);
                 break;
             case GameStates.game:
                 //If we're on a node, and we can move somewhere else
@@ -79,6 +90,7 @@ public class CharMovement : MonoBehaviour
                 {
                     drawing = true;
                 }
+
                 else if (drawing && previousNode.state == NodeState.active)
                 {
                     //Touched edge
@@ -86,10 +98,13 @@ public class CharMovement : MonoBehaviour
                     constructionPath.Add(previousNode);
                     for (int i = 0; i < constructionPath.Count; i++)
                     {
+                        //perform flood fill
+                        
                         constructionPath[i].state = NodeState.active;
 
                         if (i > 0)
                         {
+                            
                             if (constructionPath[i - 1].position.x > constructionPath[i].position.x)
                             {
                                 //Moved left
@@ -118,128 +133,90 @@ public class CharMovement : MonoBehaviour
                         }
 
                         WorldGenerator.Instance.PaintActive((int)constructionPath[i].position.x, (int)constructionPath[i].position.y);
+                        
                     }
+
+                    //if the end point of the paths y is greater than the starting path pos
+                    if ((int)constructionPath[constructionPath.Count - 1].position.y > (int)constructionPath[0].position.y)
+                    {
+                        //start filling from the 1 path pos up
+                        floodFill((int)constructionPath[1].position.x, (int)constructionPath[1].position.y + 1, 1);
+                    }
+                    //else if the end point of the paths y is less than the starting path pos
+                    else if ((int)constructionPath[constructionPath.Count - 1].position.y < (int)constructionPath[0].position.y)
+                    {
+                        //start filling downwards
+                        floodFill((int)constructionPath[1].position.x, (int)constructionPath[1].position.y - 1, 1);
+                    }
+
+                    else if ((int)constructionPath[constructionPath.Count - 1].position.x > (int)constructionPath[0].position.x)
+                    {
+                        floodFill((int)constructionPath[1].position.x+1, (int)constructionPath[1].position.y, 1);
+                    }
+                    else if ((int)constructionPath[constructionPath.Count - 1].position.y < (int)constructionPath[0].position.x)
+                    {
+                        floodFill((int)constructionPath[1].position.x-1, (int)constructionPath[1].position.y, 1);
+                    }
+                                      
+                    //clear the path 
                     constructionPath.Clear();
                 }
 
-                if (InputManager.UpHeld(playerIndex, prevState, state) ||
-                    Input.GetKey(KeyCode.W))
+                if (InputManager.UpHeld(playerIndex, prevState, state))
                 {
-                    if (validUp)
-                    {
-                        //if vertical movement then allow movement
-                        transform.Translate(0, 1 * moveSpeed, 0);
-                        validLeft = false;
-                        validRight = false;
-                        validDown = true;
+					if (!inputStack.Contains(MoveInput.UP))
+				    {
+                		//add to stack
+                		inputStack.Add(MoveInput.UP);
+					}
+                }
+				else //if no longer being held, remove from the list
+				{
+					inputStack.Remove(MoveInput.UP);
+				}
 
-                    }
-                    else if (drawing)
-                    {
-                        transform.Translate(0, 1 * moveSpeed, 0);
-                        validLeft = true;
-                        validRight = true;
-                        validUp = true;
-                        validDown = false;
-                    }
-                }
-                if (InputManager.DownHeld(playerIndex, prevState, state) ||
-                    Input.GetKey(KeyCode.S))
+		
+                if (InputManager.DownHeld(playerIndex, prevState, state))
                 {
-                    if (validDown)
-                    {
-                        transform.Translate(0, -1 * moveSpeed, 0);
-                        validLeft = false;
-                        validRight = false;
-                        validUp = true;
-                    }
-                    else if (drawing)
-                    {
-                        transform.Translate(0, -1 * moveSpeed, 0);
-                        validLeft = true;
-                        validRight = true;
-                        validDown = true;
-                        validUp = false;
-                    }
-                }
-                if (InputManager.LeftHeld(playerIndex, prevState, state)
-                    || Input.GetKey(KeyCode.A))
+					if (!inputStack.Contains(MoveInput.DOWN))
+					{
+						//add to stack
+						inputStack.Add(MoveInput.DOWN);
+					}
+				}
+				else //if no longer being held, remove from the list
+				{
+					inputStack.Remove(MoveInput.DOWN);
+				}
+		
+                if (InputManager.LeftHeld(playerIndex, prevState, state))
                 {
-                    if (validLeft)
-                    {
-                        transform.Translate(-1 * moveSpeed, 0, 0);
-                        validUp = false;
-                        validDown = false;
-                        validRight = true;
-                    }
-                    else if (drawing)
-                    {
-                        transform.Translate(-1 * moveSpeed, 0, 0);
-                        validLeft = true;
-                        validRight = false;
-                        validDown = true;
-                        validUp = true;
-                    }
+					if (!inputStack.Contains(MoveInput.LEFT))
+					{
+						//add to stack
+						inputStack.Add(MoveInput.LEFT);
+					}
                 }
-                if (InputManager.RightHeld(playerIndex, prevState, state)
-                    || Input.GetKey(KeyCode.D))
-                {
-                    if (validRight)
-                    {
-                        transform.Translate(1 * moveSpeed, 0, 0);
-                        validUp = false;
-                        validDown = false;
-                        validLeft = true;
-                    }
-                    else if (drawing)
-                    {
-                        transform.Translate(1 * moveSpeed, 0, 0);
-                        validLeft = true;
-                        validRight = true;
-                        validDown = true;
-                        validUp = false;
-                    }
-                }
-                int x1 = 0;
-                int x2 = 0;
-                int y1 = 0;
-                int y2 = 0;
-                bool fill = false;
-                for (int i = 1; i < constructionPath.Count-1; i++)
-                {
-                    if (constructionPath[constructionPath.Count - 1].directions[0])
-                    {
-                        if (WorldGenerator.Instance.grid[(int)constructionPath[i].position.x - 1, (int)constructionPath[i].position.y].m_node.state == NodeState.active || WorldGenerator.Instance.grid[(int)constructionPath[i].position.x + 1, (int)constructionPath[i].position.y].m_node.state == NodeState.active)
-                        {
-                            continue;
-                        }
+				else //if no longer being held, remove from the list
+				{
+					inputStack.Remove(MoveInput.LEFT);
+				}
 
-                        //We need to go left and right of x-1 
-                        x1 = (int)constructionPath[i].position.x - 1;
-                        y1 = (int)constructionPath[i].position.y;
-                        x2 = (int)constructionPath[i].position.x + 1;
-                        y2 = (int)constructionPath[i].position.y;
-                        fill = true;
-                    }
-                    else
-                    {
-                        if (WorldGenerator.Instance.grid[(int)constructionPath[i].position.x, (int)constructionPath[i].position.y - 1].m_node.state == NodeState.active || WorldGenerator.Instance.grid[(int)constructionPath[i].position.x, (int)constructionPath[i].position.y + 1].m_node.state == NodeState.active)
-                        {
-                            continue;
-                        }
-                        //We need to go up and down of x-1
-                        x1 = (int)constructionPath[i].position.x;
-                        y1 = (int)constructionPath[i].position.y - 1;
-                        x2 = (int)constructionPath[i].position.x;
-                        y2 = (int)constructionPath[i].position.y + 1;
-                        fill = true;
-                    }
-                }
-                if (fill)
+                if (InputManager.RightHeld(playerIndex, prevState, state))
                 {
-                    StartCoroutine(WorldGenerator.Instance.PaintFill(x1, x2, y1, y2));
+					if (!inputStack.Contains(MoveInput.RIGHT))
+					{
+					//add to stack
+					inputStack.Add(MoveInput.RIGHT);         
+					}
                 }
-                constructionPath.Clear();
+				else //if no longer being held, remove from the list
+				{
+					inputStack.Remove(MoveInput.RIGHT);
+				}
+
+				//apply the stack in order & only if valid
+				ApplyMoveInput ();
 
                 if (drawing && constructionPath.Count == 0)
                 {
@@ -275,7 +252,193 @@ public class CharMovement : MonoBehaviour
                 break;
             default:
                 break;
+		}
+	}
+
+	//loop through the list of inputs until a valid one is found
+	//when the first valid movement is found, it is applied and then will notapply another movement
+	void ApplyMoveInput ()
+	{
+		for (int i = 0; i < inputStack.Count; i++)
+		{
+			bool breakIt = false;
+
+			switch (inputStack[i])
+			{
+			case MoveInput.UP:
+				if (validUp)
+				{
+					//if vertical movement then allow movement
+					transform.Translate(0, 1 * moveSpeed, 0);
+					validLeft = false;
+					validRight = false;
+					validDown = true;
+
+					if (drawing)
+					{
+						AmmendValidInputs ();
+					}
+
+					breakIt = true;
+				}
+				else if (drawing)
+				{
+					transform.Translate(0, 1 * moveSpeed, 0);
+					validLeft = true;
+					validRight = true;
+					validUp = true;
+					validDown = false;
+
+					AmmendValidInputs ();
+
+					lastInput = inputStack[i];
+					breakIt = true;
+				}
+				break;
+			case MoveInput.DOWN:
+				if (validDown)
+				{
+					transform.Translate(0, -1 * moveSpeed, 0);
+					validLeft = false;
+					validRight = false;
+					validUp = true;
+
+					if (drawing)
+					{
+						AmmendValidInputs ();
+					}
+
+					breakIt = true;
+				}
+				else if (drawing)
+				{
+					transform.Translate(0, -1 * moveSpeed, 0);
+					validLeft = true;
+					validRight = true;
+					validDown = true;
+					validUp = false;
+
+					AmmendValidInputs ();
+
+					lastInput = inputStack[i];
+					breakIt = true;
+				}
+
+				break;
+			case MoveInput.LEFT:
+				if (validLeft)
+				{
+					transform.Translate(-1 * moveSpeed, 0, 0);
+					validUp = false;
+					validDown = false;
+					validRight = true;
+
+					if (drawing)
+					{
+						AmmendValidInputs ();
+					}
+
+					breakIt = true;
+				}
+				else if (drawing)
+				{
+					transform.Translate(-1 * moveSpeed, 0, 0);
+					validLeft = true;
+					validRight = false;
+					validDown = true;
+					validUp = true;
+
+					AmmendValidInputs ();
+
+					lastInput = inputStack[i];
+					breakIt = true;
+				}
+
+				break;
+			case MoveInput.RIGHT:
+				if (validRight)
+				{
+					transform.Translate(1 * moveSpeed, 0, 0);
+					validUp = false;
+					validDown = false;
+					validLeft = true;
+
+					if (drawing)
+					{
+						AmmendValidInputs ();
+					}
+
+					breakIt = true;
+				}
+				else if (drawing)
+				{
+					transform.Translate(1 * moveSpeed, 0, 0);
+
+					validLeft = true;
+					validRight = true;
+					validDown = true;
+					validUp = false;
+
+					AmmendValidInputs ();
+
+					lastInput = inputStack[i];
+					breakIt = true;
+				}          
+				break;
+			}
+
+			if (breakIt)
+			{
+				break;
+			}
+		}
+	}
+
+	void AmmendValidInputs ()
+	{
+		//ammend valid inputs so that the player cannot go backwards
+		switch (lastInput)
+		{
+		case MoveInput.UP:
+			validDown = false;
+			break;
+		case MoveInput.DOWN:
+			validUp = false;
+			break;
+		case MoveInput.LEFT:
+			validRight = false;
+			break;
+		case MoveInput.RIGHT:
+			validLeft = false;
+			break;
+		}
+	}
+
+    /// <summary>
+    /// flood fill algorithm called after lines are completed
+    /// </summary>
+    /// <param name="x"></param>
+    /// <param name="y"></param>
+    /// <param name="i"></param>
+    void floodFill(int x, int y, int i)
+    {
+        if(x < 0 || x > 149 || y < 0 || y > 74)
+        {
+            return;
         }
+        if ((WorldGenerator.Instance.grid[x, y].m_node.state == NodeState.active))
+        {
+            return;            
+        }
+        
+        
+        //axis.Add(new KeyValuePair<int, int>(x, y));
+        WorldGenerator.Instance.PaintActive(x,y);
+        WorldGenerator.Instance.grid[x, y].m_node.state = NodeState.active;
+        floodFill(x+1, y,i);
+        floodFill(x-1, y,i);
+        floodFill(x, y+1, i);
+        floodFill(x, y-1, i);
+        
     }
-       
 }

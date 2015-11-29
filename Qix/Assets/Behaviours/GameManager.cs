@@ -25,9 +25,12 @@ public class GameManager : MonoBehaviour
 
     private string creditsString = "CREDITS";
     private int creditsInt = 64;
+    public bool noController = false;
 
     //GameObject references 
     public List<GameObject> _players = new List<GameObject>();
+
+    public AudioClip music;
     
 	void Awake()
     {
@@ -37,20 +40,37 @@ public class GameManager : MonoBehaviour
 
         //set up UI
         int length = InputManager._indexOfControllers.Count;
-        int controlIndex = 0;
-        for (int i = 0; i < length; i++)
+
+        //if there are connected devices start with controllers
+        if (length > 0)
         {
+            int controlIndex = 0;
+            for (int i = 0; i < length; i++)
+            {
+                //set up player icon in ui
+                playerUIElements[i].SetActive(true);
+
+                _players[i].SetActive(true);
+
+                //set up player and controller indexes
+                _players[i].GetComponent<CharMovement>().playerIndex = i;
+                _players[i].GetComponent<CharMovement>().controllerIndex = controlIndex;
+
+                controlIndex++;
+            }
+        }
+        //else use keyboard
+        else
+        {
+            noController = true;
             //set up player icon in ui
-            playerUIElements[i].SetActive(true);
+            playerUIElements[0].SetActive(true);
 
-            _players[i].SetActive(true);     
+            _players[0].SetActive(true);
 
-            //set up player and controller indexes
-            _players[i].GetComponent<CharMovement>().playerIndex = i;
-            _players[i].GetComponent<CharMovement>().controllerIndex = controlIndex;
-
-            controlIndex++;
-           
+            ////set up player and controller indexes
+            _players[0].GetComponent<CharMovement>().playerIndex = 0;
+            _players[0].GetComponent<CharMovement>().controllerIndex = 0;
         }
 
         //set state to menu
@@ -92,11 +112,16 @@ public class GameManager : MonoBehaviour
                     }
                 }
 
-                //space == boot game
-                if(Input.GetKey(KeyCode.Space))
+                //space == boot game and make sure at least one player 
+                //has joined the game
+                if(Input.GetKey(KeyCode.L)
+                    && creditsInt< 64)
                 {
                     //set game state
                     m_state = GameStates.game;
+
+                    //start music
+                    //AudioManager.instance.PlayMusic(music);
 
                     //loop over all possible players
                     for (int i = 0; i < _players.Count; i++)
@@ -126,6 +151,5 @@ public class GameManager : MonoBehaviour
         }
 		
 	}
-	
 
 }
