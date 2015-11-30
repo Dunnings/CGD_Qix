@@ -248,18 +248,26 @@ public class CharMovement : MonoBehaviour
                         int areaR = 0;
 
                         //calculate the area to the left and to the right
-                        calcFloodFill((int)constructionPath[1].position.x + 1, (int)constructionPath[1].position.y, ref areaR, 4);
-                        CheckedNodes.Clear();
+                        //calcFloodFill((int)constructionPath[1].position.x + 1, (int)constructionPath[1].position.y, ref areaR, 4);
+                        //CheckedNodes.Clear();
 
-                        //if the area to the right is greater
-                        if (areaR > (150*75)-areaR)
+                        ////if the area to the right is greater
+                        //if (areaR > (150*75)-areaR)
+                        //{
+                        //    //flood fill to the left
+                        //    FloodFill((int)constructionPath[1].position.x - 1, (int)constructionPath[1].position.y);
+                        //}
+                        //else
+                        //{
+                        //    //else flood fill to the right
+                        //    FloodFill((int)constructionPath[1].position.x + 1, (int)constructionPath[1].position.y);
+                        //}
+                        if(CanPathToQix((int)constructionPath[1].position.x + 1, (int)constructionPath[1].position.y))
                         {
-                            //flood fill to the left
                             FloodFill((int)constructionPath[1].position.x - 1, (int)constructionPath[1].position.y);
                         }
                         else
                         {
-                            //else flood fill to the right
                             FloodFill((int)constructionPath[1].position.x + 1, (int)constructionPath[1].position.y);
                         }
                     }
@@ -271,20 +279,29 @@ public class CharMovement : MonoBehaviour
                     {
                         int areaU = 0;
 
-                        //calculate the area to the left and to the right
-                        calcFloodFill((int)constructionPath[1].position.x, (int)constructionPath[1].position.y + 1, ref areaU, 4);
-                        CheckedNodes.Clear();
+                        ////calculate the area to the left and to the right
+                        //calcFloodFill((int)constructionPath[1].position.x, (int)constructionPath[1].position.y + 1, ref areaU, 4);
+                        //CheckedNodes.Clear();
 
-                        //if the area to the right is greater
-                        if (areaU > (150 * 75) - areaU)
+                        ////if the area to the right is greater
+                        //if (areaU > (150 * 75) - areaU)
+                        //{
+                        //    //flood fill to the left
+                        //    FloodFill((int)constructionPath[1].position.x, (int)constructionPath[1].position.y - 1);
+                        //}
+                        //else
+                        //{
+                        //    //else flood fill to the right
+                        //    FloodFill((int)constructionPath[1].position.x + 1, (int)constructionPath[1].position.y + 1);
+                        //}
+
+                        if (CanPathToQix((int)constructionPath[1].position.x, (int)constructionPath[1].position.y + 1))
                         {
-                            //flood fill to the left
                             FloodFill((int)constructionPath[1].position.x, (int)constructionPath[1].position.y - 1);
                         }
                         else
                         {
-                            //else flood fill to the right
-                            FloodFill((int)constructionPath[1].position.x + 1, (int)constructionPath[1].position.y + 1);
+                            FloodFill((int)constructionPath[1].position.x, (int)constructionPath[1].position.y - 1);
                         }
                     }
                                       
@@ -583,6 +600,23 @@ public class CharMovement : MonoBehaviour
         {
             calcFloodFill(x, y - 1, ref area, 2);
         }
+    }
+
+    bool CanPathToQix(int x, int y)
+    {
+        Vector2 QixPos = new Vector2(75, 30);
+        
+        RaycastHit2D[] hits = Physics2D.RaycastAll(new Vector2(x, y), QixPos - new Vector2(x, y));
+        Debug.DrawLine(new Vector3(x, y, 10f), new Vector3(QixPos.x, QixPos.y, 10f), Color.blue);
+        int count = 0;
+        for (int i = 0; i < hits.Length; i++)
+        {
+            if (constructionPath.Contains(hits[i].collider.transform.GetComponent<GridElement>().m_node))
+            {
+                count++;
+            }
+        }
+        return count % 2 != 0;
     }
 
     void FloodFill(int x, int y)
