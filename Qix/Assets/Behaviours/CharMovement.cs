@@ -201,9 +201,9 @@ public class CharMovement : MonoBehaviour
                     {
                         int areaR = 0;
 
-                        //calculate the area to the left and to the right
-                        calcFloodFill((int)constructionPath[1].position.x + 1, (int)constructionPath[1].position.y, ref areaR, 4);
-                        CheckedNodes.Clear();
+                        ////calculate the area to the left and to the right
+                        //calcFloodFill((int)constructionPath[1].position.x + 1, (int)constructionPath[1].position.y, ref areaR, 4);
+                        //CheckedNodes.Clear();
 
                         //if the area to the right is greater
                         if (areaR > (150*75)-areaR)
