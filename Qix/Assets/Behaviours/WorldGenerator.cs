@@ -37,6 +37,9 @@ public class WorldGenerator : MonoBehaviour
             for (int y = 0; y < mapHeight; y++)
             {
                 GridElement gridElement = new GridElement();
+                //GameObject go = new GameObject();
+                //go.AddComponent<BoxCollider2D>();
+                //go.transform.position = gridElement.m_pos;
                 //gridElement.name = x + " - " + y;
 
                 gridElement.m_pos = new Vector2(x, y);

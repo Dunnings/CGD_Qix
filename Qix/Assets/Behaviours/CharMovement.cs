@@ -21,6 +21,7 @@ public class CharMovement : MonoBehaviour
 	GamePadState state, prevState;
     //Controller axes
     public List<KeyValuePair<int, int>> axis = new List<KeyValuePair<int, int>>();
+    public List<Node> CheckedNodes = new List<Node>();
 
     //Fuse
     public GameObject fuse;
@@ -424,12 +425,6 @@ public class CharMovement : MonoBehaviour
 
         
     }
-
-    //loop through the list of inputs until a valid one is found
-    //when the first valid movement is found, it is applied and then will notapply another movement
-    void ApplyMoveInput ()
-
-	}
 
 	//loop through the list of inputs until a valid one is found
 	//when the first valid movement is found, it is applied and then will not apply another movement
