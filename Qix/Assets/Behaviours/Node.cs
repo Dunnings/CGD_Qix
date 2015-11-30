@@ -8,7 +8,8 @@ public enum NodeState
 {
     active,
     construction,
-    inactive
+    inactive,
+    testing
 }
 
 public class Node

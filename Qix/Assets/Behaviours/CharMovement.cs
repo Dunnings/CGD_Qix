@@ -181,32 +181,118 @@ public class CharMovement : MonoBehaviour
                         
                     }
 
-                    //if the end point of the paths y is greater than the starting path pos
-                    if ((int)constructionPath[constructionPath.Count - 1].position.y > (int)constructionPath[0].position.y)
+                    ////if the end point of the paths y is greater than the starting path pos
+                    //if ((int)constructionPath[constructionPath.Count - 1].position.y > (int)constructionPath[0].position.y &&
+                    //    (int)constructionPath[constructionPath.Count - 1].position.x == (int)constructionPath[0].position.x)
+                    //{
+                    //    //start filling from the 1 path pos up
+                    //    floodFill((int)constructionPath[1].position.x, (int)constructionPath[1].position.y + 1, 1);
+                    //}
+                    ////else if the end point of the paths y is less than the starting path pos
+                    //else if ((int)constructionPath[constructionPath.Count - 1].position.y < (int)constructionPath[0].position.y &&
+                    //    (int)constructionPath[constructionPath.Count - 1].position.x == (int)constructionPath[0].position.x)
+                    //{
+                    //    //start filling downwards
+                    //    floodFill((int)constructionPath[1].position.x, (int)constructionPath[1].position.y - 1, 1);
+                    //}
+
+                    ////x axis
+                    //else if ((int)constructionPath[constructionPath.Count - 1].position.x > (int)constructionPath[0].position.x &&
+                    //    (int)constructionPath[constructionPath.Count - 1].position.y == (int)constructionPath[0].position.y)
+                    //{
+                    //    floodFill((int)constructionPath[1].position.x+1, (int)constructionPath[1].position.y, 1);
+                    //}
+                    //else if ((int)constructionPath[constructionPath.Count - 1].position.x < (int)constructionPath[0].position.x &&
+                    //    (int)constructionPath[constructionPath.Count - 1].position.y == (int)constructionPath[0].position.y)
+                    //{
+                    //    floodFill((int)constructionPath[1].position.x-1, (int)constructionPath[1].position.y, 1);
+                    //}
+
+                    
+                    //else if ((int)constructionPath[constructionPath.Count - 1].position.y > (int)constructionPath[0].position.y &&
+                    //    (int)constructionPath[constructionPath.Count - 1].position.x < (int)constructionPath[0].position.x)
+                    //{
+                    //    floodFill((int)constructionPath[1].position.x - 1, (int)constructionPath[1].position.y, 1);
+                    //}
+                    //else if ((int)constructionPath[constructionPath.Count - 1].position.y > (int)constructionPath[0].position.y &&
+                    //(int)constructionPath[constructionPath.Count - 1].position.x > (int)constructionPath[0].position.x)
+                    //{
+                    //    floodFill((int)constructionPath[1].position.x + 1, (int)constructionPath[1].position.y + 1, 1);
+                    //}
+
+
+                    //else if ((int)constructionPath[constructionPath.Count - 1].position.y < (int)constructionPath[0].position.y &&
+                    //   (int)constructionPath[constructionPath.Count - 1].position.x > (int)constructionPath[0].position.x)
+                    //{
+                    //    if ((int)constructionPath[constructionPath.Count - 2].x)
+                    //    floodFill((int)constructionPath[1].position.x +1, (int)constructionPath[1].position.y-1, 1);
+                    //}
+
+                    //else if ((int)constructionPath[constructionPath.Count - 1].position.y > (int)constructionPath[0].position.y &&
+                    //   (int)constructionPath[constructionPath.Count - 1].position.x > (int)constructionPath[0].position.x)
+                    //{
+                    //    floodFill((int)constructionPath[1].position.x -1, (int)constructionPath[1].position.y, 1);
+                    //}
+
+                    //else if ((int)constructionPath[constructionPath.Count - 1].position.y < (int)constructionPath[0].position.y &&
+                    //  (int)constructionPath[constructionPath.Count - 1].position.x < (int)constructionPath[0].position.x)
+                    //{
+                    //    floodFill((int)constructionPath[1].position.x, (int)constructionPath[1].position.y-1, 1);
+                    //}
+
+                    //Going up or down
+                    if ((int)constructionPath[1].position.y > (int)constructionPath[0].position.y ||
+                        (int)constructionPath[1].position.y < (int)constructionPath[0].position.y)
                     {
-                        //start filling from the 1 path pos up
-                        floodFill((int)constructionPath[1].position.x, (int)constructionPath[1].position.y + 1, 1);
-                    }
-                    //else if the end point of the paths y is less than the starting path pos
-                    else if ((int)constructionPath[constructionPath.Count - 1].position.y < (int)constructionPath[0].position.y)
-                    {
-                        //start filling downwards
-                        floodFill((int)constructionPath[1].position.x, (int)constructionPath[1].position.y - 1, 1);
+                        int areaR = 0;
+
+                        //calculate the area to the left and to the right
+                        calcFloodFill((int)constructionPath[1].position.x + 1, (int)constructionPath[1].position.y, ref areaR, 4);
+                        CheckedNodes.Clear();
+
+                        //if the area to the right is greater
+                        if (areaR > (150*75)-areaR)
+                        {
+                            //flood fill to the left
+                            FloodFill((int)constructionPath[1].position.x - 1, (int)constructionPath[1].position.y);
+                        }
+                        else
+                        {
+                            //else flood fill to the right
+                            FloodFill((int)constructionPath[1].position.x + 1, (int)constructionPath[1].position.y);
+                        }
                     }
 
-                    else if ((int)constructionPath[constructionPath.Count - 1].position.x > (int)constructionPath[0].position.x)
+
+                    //Going left or right
+                    else if ((int)constructionPath[1].position.x > (int)constructionPath[0].position.x ||
+                        (int)constructionPath[1].position.x < (int)constructionPath[0].position.x)
                     {
-                        floodFill((int)constructionPath[1].position.x+1, (int)constructionPath[1].position.y, 1);
-                    }
-                    else if ((int)constructionPath[constructionPath.Count - 1].position.y < (int)constructionPath[0].position.x)
-                    {
-                        floodFill((int)constructionPath[1].position.x-1, (int)constructionPath[1].position.y, 1);
+                        int areaU = 0;
+
+                        //calculate the area to the left and to the right
+                        calcFloodFill((int)constructionPath[1].position.x, (int)constructionPath[1].position.y + 1, ref areaU, 4);
+                        CheckedNodes.Clear();
+
+                        //if the area to the right is greater
+                        if (areaU > (150 * 75) - areaU)
+                        {
+                            //flood fill to the left
+                            FloodFill((int)constructionPath[1].position.x, (int)constructionPath[1].position.y - 1);
+                        }
+                        else
+                        {
+                            //else flood fill to the right
+                            FloodFill((int)constructionPath[1].position.x + 1, (int)constructionPath[1].position.y + 1);
+                        }
                     }
                                       
                     //clear the path 
                     constructionPath.Clear();
                     fusePathPosition = 0;
                 }
+
+
 
                 if (InputManager.UpHeld(playerIndex, prevState, state))
                 {
@@ -342,6 +428,12 @@ public class CharMovement : MonoBehaviour
     //loop through the list of inputs until a valid one is found
     //when the first valid movement is found, it is applied and then will notapply another movement
     void ApplyMoveInput ()
+
+	}
+
+	//loop through the list of inputs until a valid one is found
+	//when the first valid movement is found, it is applied and then will not apply another movement
+	void ApplyMoveInput ()
 	{
 		SetLocation ();
 
@@ -454,9 +546,9 @@ public class CharMovement : MonoBehaviour
     /// <param name="x"></param>
     /// <param name="y"></param>
     /// <param name="i"></param>
-    void floodFill(int x, int y, int i)
+    void calcFloodFill(int x, int y, ref int area, int direction)
     {
-        if(x < 0 || x > 149 || y < 0 || y > 74)
+        if(x < 1 || x > 148 || y < 1 || y > 74)
         {
             return;
         }
@@ -464,15 +556,59 @@ public class CharMovement : MonoBehaviour
         {
             return;            
         }
-        
+
+        if (CheckedNodes.Contains(WorldGenerator.Instance.grid[x, y].m_node))
+        {
+            return;
+        }
         
         //axis.Add(new KeyValuePair<int, int>(x, y));
-        WorldGenerator.Instance.PaintActive(x,y);
+        //WorldGenerator.Instance.PaintActive(x,y);
+        area++;
+
+        CheckedNodes.Add(WorldGenerator.Instance.grid[x, y].m_node);
+
+        //WorldGenerator.Instance.grid[x, y].m_node.state = NodeState.testing;
+
+
+        //4 = none, 0=up,1=right,2=down,3=left
+        if (direction != 3)
+        {
+            calcFloodFill(x + 1, y, ref area, 1);
+        }
+        if (direction != 1)
+        {
+            calcFloodFill(x - 1, y, ref area, 3);
+        }
+        if (direction != 2)
+        {
+            calcFloodFill(x, y + 1, ref area, 0);
+        }
+        if (direction != 0)
+        {
+            calcFloodFill(x, y - 1, ref area, 2);
+        }
+    }
+
+    void FloodFill(int x, int y)
+    {
+        if (x < 1 || x > 148 || y < 1 || y > 74)
+        {
+            return;
+        }
+        if ((WorldGenerator.Instance.grid[x, y].m_node.state == NodeState.active))
+        {
+            return;
+        }
+                
         WorldGenerator.Instance.grid[x, y].m_node.state = NodeState.active;
-        floodFill(x+1, y,i);
-        floodFill(x-1, y,i);
-        floodFill(x, y+1, i);
-        floodFill(x, y-1, i);   
+
+        WorldGenerator.Instance.PaintActive(x, y);
+
+        FloodFill(x + 1, y);  
+        FloodFill(x - 1, y);
+        FloodFill(x, y + 1);
+        FloodFill(x, y - 1);   
     }
 
 	//finds where the character is in the grid and then adds
