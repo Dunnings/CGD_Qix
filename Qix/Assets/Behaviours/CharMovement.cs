@@ -20,22 +20,29 @@ public class CharMovement : MonoBehaviour
 	//it works as a stack and updates once an input toggles (from held to released etc)
 	List<MoveInput> inputStack = new List<MoveInput>();
 
+	public enum GridLoc {UP, DOWN, LEFT, RIGHT, MID};
+
+	public List<GridLoc> location = new List<GridLoc>();
+
+
 	public MoveInput lastInput;
 
-    Node previousNode;
+    Node currentNode;
 
     public AudioClip moveSound;
 
     void Start()
     {
         hitNode(WorldGenerator.Instance.grid[0, 0].m_node);
+
+		SetLocation ();
     }
 
     void hitNode(Node inputNode)
     {
-        if (inputNode != previousNode)
+        if (inputNode != currentNode)
         {
-            previousNode = inputNode;
+            currentNode = inputNode;
             if (inputNode.state == NodeState.inactive && drawing)
             {
                 inputNode.state = NodeState.construction;
@@ -76,26 +83,17 @@ public class CharMovement : MonoBehaviour
                 //Set the current line to the one we should be moving down
 
 
-                //Check if current tile is node
-                //for (int i = 0; i < allTheNodes.Count; i++)
-                //{
-
-                //    if (transform.position == allTheNodes[i].position)
-                //    {
-                //        hitNode(allTheNodes[i]);
-                //    }
-                //}
                 if (InputManager.ActionHeld(playerIndex, prevState, state) ||
                     Input.GetKey(KeyCode.Space))
                 {
                     drawing = true;
                 }
 
-                else if (drawing && previousNode.state == NodeState.active)
+                else if (drawing && currentNode.state == NodeState.active)
                 {
                     //Touched edge
                     drawing = false;
-                    constructionPath.Add(previousNode);
+                    constructionPath.Add(currentNode);
                     for (int i = 0; i < constructionPath.Count; i++)
                     {
                         //perform flood fill
@@ -220,31 +218,31 @@ public class CharMovement : MonoBehaviour
 
                 if (drawing && constructionPath.Count == 0)
                 {
-                    constructionPath.Add(previousNode);
+                    constructionPath.Add(currentNode);
                 }
 
-                if (Mathf.RoundToInt(transform.position.x + 0.5f) > previousNode.position.x)
+                if (Mathf.RoundToInt(transform.position.x + 0.5f) > currentNode.position.x)
                 {
                     //Moved right one node
-                    Node n = WorldGenerator.Instance.grid[(int)previousNode.position.x + 1, (int)previousNode.position.y].m_node;
+                    Node n = WorldGenerator.Instance.grid[(int)currentNode.position.x + 1, (int)currentNode.position.y].m_node;
                     hitNode(n);
                 }
-                if (Mathf.RoundToInt(transform.position.x + 0.5f) < previousNode.position.x)
+                if (Mathf.RoundToInt(transform.position.x + 0.5f) < currentNode.position.x)
                 {
                     //Moved left one node
-                    Node n = WorldGenerator.Instance.grid[(int)previousNode.position.x - 1, (int)previousNode.position.y].m_node;
+                    Node n = WorldGenerator.Instance.grid[(int)currentNode.position.x - 1, (int)currentNode.position.y].m_node;
                     hitNode(n);
                 }
-                if (Mathf.RoundToInt(transform.position.y + 0.5f) > previousNode.position.y)
+                if (Mathf.RoundToInt(transform.position.y + 0.5f) > currentNode.position.y)
                 {
                     //Moved up one node
-                    Node n = WorldGenerator.Instance.grid[(int)previousNode.position.x, (int)previousNode.position.y + 1].m_node;
+                    Node n = WorldGenerator.Instance.grid[(int)currentNode.position.x, (int)currentNode.position.y + 1].m_node;
                     hitNode(n);
                 }
-                if (Mathf.RoundToInt(transform.position.y + 0.5f) < previousNode.position.y)
+                if (Mathf.RoundToInt(transform.position.y + 0.5f) < currentNode.position.y)
                 {
                     //Moved left one node
-                    Node n = WorldGenerator.Instance.grid[(int)previousNode.position.x, (int)previousNode.position.y - 1].m_node;
+                    Node n = WorldGenerator.Instance.grid[(int)currentNode.position.x, (int)currentNode.position.y - 1].m_node;
                     hitNode(n);
                 }
                 break;
@@ -253,12 +251,17 @@ public class CharMovement : MonoBehaviour
             default:
                 break;
 		}
+
+
+
 	}
 
 	//loop through the list of inputs until a valid one is found
 	//when the first valid movement is found, it is applied and then will notapply another movement
 	void ApplyMoveInput ()
 	{
+		SetLocation ();
+
 		for (int i = 0; i < inputStack.Count; i++)
 		{
 			bool breakIt = false;
@@ -266,124 +269,86 @@ public class CharMovement : MonoBehaviour
 			switch (inputStack[i])
 			{
 			case MoveInput.UP:
-				if (validUp)
+				if (validUp || (drawing && location.Contains(GridLoc.DOWN)))
 				{
+
 					//if vertical movement then allow movement
 					transform.Translate(0, 1 * moveSpeed, 0);
 					validLeft = false;
 					validRight = false;
 					validDown = true;
+					validUp = true;
 
 					if (drawing)
 					{
-						AmmendValidInputs ();
+						validLeft = true;
+						validRight = true;
+						validDown = false;
+						//AmmendValidInputs ();
 					}
 
 					breakIt = true;
 				}
-				else if (drawing)
-				{
-					transform.Translate(0, 1 * moveSpeed, 0);
-					validLeft = true;
-					validRight = true;
-					validUp = true;
-					validDown = false;
-
-					AmmendValidInputs ();
-
-					lastInput = inputStack[i];
-					breakIt = true;
-				}
 				break;
 			case MoveInput.DOWN:
-				if (validDown)
+				if (validDown || (drawing && location.Contains(GridLoc.UP)))
 				{
 					transform.Translate(0, -1 * moveSpeed, 0);
 					validLeft = false;
 					validRight = false;
 					validUp = true;
+					validDown = true;
 
 					if (drawing)
 					{
-						AmmendValidInputs ();
+						validLeft = true;
+						validRight = true;
+						validUp = false;
+						//AmmendValidInputs ();
 					}
-
+					
 					breakIt = true;
 				}
-				else if (drawing)
-				{
-					transform.Translate(0, -1 * moveSpeed, 0);
-					validLeft = true;
-					validRight = true;
-					validDown = true;
-					validUp = false;
-
-					AmmendValidInputs ();
-
-					lastInput = inputStack[i];
-					breakIt = true;
-				}
-
 				break;
 			case MoveInput.LEFT:
-				if (validLeft)
+				if (validLeft || (drawing && location.Contains(GridLoc.RIGHT)))
 				{
 					transform.Translate(-1 * moveSpeed, 0, 0);
 					validUp = false;
 					validDown = false;
 					validRight = true;
+					validLeft = true;
 
 					if (drawing)
 					{
-						AmmendValidInputs ();
+						validUp = true;
+						validRight = false;
+						validDown = true;
+						//AmmendValidInputs ();
 					}
-
+					
 					breakIt = true;
 				}
-				else if (drawing)
-				{
-					transform.Translate(-1 * moveSpeed, 0, 0);
-					validLeft = true;
-					validRight = false;
-					validDown = true;
-					validUp = true;
-
-					AmmendValidInputs ();
-
-					lastInput = inputStack[i];
-					breakIt = true;
-				}
-
 				break;
 			case MoveInput.RIGHT:
-				if (validRight)
+				if (validRight || (drawing && location.Contains(GridLoc.LEFT)))
 				{
 					transform.Translate(1 * moveSpeed, 0, 0);
 					validUp = false;
 					validDown = false;
 					validLeft = true;
+					validRight = true;
 
 					if (drawing)
 					{
-						AmmendValidInputs ();
+						validLeft = false;
+						validUp = true;
+						validDown = true;
+						//AmmendValidInputs ();
 					}
-
+					
 					breakIt = true;
-				}
-				else if (drawing)
-				{
-					transform.Translate(1 * moveSpeed, 0, 0);
-
-					validLeft = true;
-					validRight = true;
-					validDown = true;
-					validUp = false;
-
-					AmmendValidInputs ();
-
-					lastInput = inputStack[i];
-					breakIt = true;
-				}          
+				}    
 				break;
 			}
 
@@ -396,22 +361,8 @@ public class CharMovement : MonoBehaviour
 
 	void AmmendValidInputs ()
 	{
-		//ammend valid inputs so that the player cannot go backwards
-		switch (lastInput)
-		{
-		case MoveInput.UP:
-			validDown = false;
-			break;
-		case MoveInput.DOWN:
-			validUp = false;
-			break;
-		case MoveInput.LEFT:
-			validRight = false;
-			break;
-		case MoveInput.RIGHT:
-			validLeft = false;
-			break;
-		}
+		//Ammend validity statements so that the player can leave the grid
+		//if (location.Contains (GridLoc.UP) && drawing) 
 	}
 
     /// <summary>
@@ -438,7 +389,34 @@ public class CharMovement : MonoBehaviour
         floodFill(x+1, y,i);
         floodFill(x-1, y,i);
         floodFill(x, y+1, i);
-        floodFill(x, y-1, i);
-        
+        floodFill(x, y-1, i);   
     }
+
+	//finds where the character is in the grid and then adds
+	void SetLocation ()
+	{
+		bool notEdgeX = false;
+
+		location.Clear ();
+
+		//find where in the grid the player is
+		if (currentNode.position.x == 0) {
+			location.Add (GridLoc.LEFT);
+		} else if (currentNode.position.x == 149) {
+			location.Add (GridLoc.RIGHT);
+		} else {
+			notEdgeX = true;
+		}
+
+		if (currentNode.position.y == 1) {
+			location.Add (GridLoc.DOWN);
+		} else if (currentNode.position.y == 74) {
+			location.Add (GridLoc.UP);
+		} else {
+			if (notEdgeX)
+			{
+				location.Add(GridLoc.MID);
+			}
+		}
+	}
 }
