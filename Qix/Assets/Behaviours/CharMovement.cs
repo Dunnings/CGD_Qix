@@ -1,7 +1,9 @@
 ﻿using UnityEngine;
+using UnityEngine.UI;
 using System.Collections;
 using XInputDotNetPure;
 using System.Collections.Generic;
+using System;
 
 public class CharMovement : MonoBehaviour
 {
@@ -24,6 +26,8 @@ public class CharMovement : MonoBehaviour
     public List<KeyValuePair<int, int>> axis = new List<KeyValuePair<int, int>>();
     public List<Node> CheckedNodes = new List<Node>();
 
+    public GameObject scoreUI;
+
     //Fuse
     public GameObject fuse;
     private float fuseWait = 1.0f;
@@ -31,6 +35,8 @@ public class CharMovement : MonoBehaviour
     private int fusePathPosition = 0;
     private float fuseSpeed = 0.02f;
     private float fuseTimeLastHitNewNode = 0f;
+
+    double score = 0.0f;
 	
 	//Input enum
 	public enum MoveInput {UP, DOWN, LEFT, RIGHT, NULL};
@@ -246,7 +252,7 @@ public class CharMovement : MonoBehaviour
                     if ((int)constructionPath[1].position.y > (int)constructionPath[0].position.y ||
                         (int)constructionPath[1].position.y < (int)constructionPath[0].position.y)
                     {
-                        int areaR = 0;
+                        int area = 0;
 
                         //calculate the area to the left and to the right
                         //calcFloodFill((int)constructionPath[1].position.x + 1, (int)constructionPath[1].position.y, ref areaR, 4);
@@ -265,11 +271,13 @@ public class CharMovement : MonoBehaviour
                         //}
                         if(CanPathToQix((int)constructionPath[1].position.x + 1, (int)constructionPath[1].position.y))
                         {
-                            FloodFill((int)constructionPath[1].position.x - 1, (int)constructionPath[1].position.y);
+                            FloodFill((int)constructionPath[1].position.x - 1, (int)constructionPath[1].position.y, ref area);
+                            UpdateScore(area);
                         }
                         else
                         {
-                            FloodFill((int)constructionPath[1].position.x + 1, (int)constructionPath[1].position.y);
+                            FloodFill((int)constructionPath[1].position.x + 1, (int)constructionPath[1].position.y, ref area);
+                            UpdateScore(area);
                         }
                     }
 
@@ -278,7 +286,7 @@ public class CharMovement : MonoBehaviour
                     else if ((int)constructionPath[1].position.x > (int)constructionPath[0].position.x ||
                         (int)constructionPath[1].position.x < (int)constructionPath[0].position.x)
                     {
-                        int areaU = 0;
+                        int area = 0;
 
                         ////calculate the area to the left and to the right
                         //calcFloodFill((int)constructionPath[1].position.x, (int)constructionPath[1].position.y + 1, ref areaU, 4);
@@ -298,11 +306,13 @@ public class CharMovement : MonoBehaviour
 
                         if (CanPathToQix((int)constructionPath[1].position.x, (int)constructionPath[1].position.y + 1))
                         {
-                            FloodFill((int)constructionPath[1].position.x, (int)constructionPath[1].position.y - 1);
+                            FloodFill((int)constructionPath[1].position.x, (int)constructionPath[1].position.y - 1, ref area);
+                            UpdateScore(area);
                         }
                         else
                         {
-                            FloodFill((int)constructionPath[1].position.x, (int)constructionPath[1].position.y - 1);
+                            FloodFill((int)constructionPath[1].position.x, (int)constructionPath[1].position.y - 1, ref area);
+                            UpdateScore(area);
                         }
                     }
                                       
@@ -620,7 +630,7 @@ public class CharMovement : MonoBehaviour
         return count % 2 != 0;
     }
 
-    void FloodFill(int x, int y)
+    void FloodFill(int x, int y, ref int area)
     {
         if (x < 1 || x > 148 || y < 1 || y > 74)
         {
@@ -634,11 +644,12 @@ public class CharMovement : MonoBehaviour
         WorldGenerator.Instance.grid[x, y].m_node.state = NodeState.active;
 
         WorldGenerator.Instance.PaintActive(x, y);
+        area++;
 
-        FloodFill(x + 1, y);  
-        FloodFill(x - 1, y);
-        FloodFill(x, y + 1);
-        FloodFill(x, y - 1);   
+        FloodFill(x + 1, y, ref area);  
+        FloodFill(x - 1, y, ref area);
+        FloodFill(x, y + 1, ref area);
+        FloodFill(x, y - 1, ref area);   
     }
 
 	//finds where the character is in the grid and then adds
@@ -668,4 +679,22 @@ public class CharMovement : MonoBehaviour
 			}
 		}
 	}
+
+    /// <summary>
+    /// called after an area is filled
+    /// </summary>
+    /// <param name="areaFilled"></param>
+    void UpdateScore(int areaFilled)
+    {
+        //calc percentage
+        double result = ((double)areaFilled / 11250) * 100;
+        //round to 0 decimal places 
+        result = Math.Round(result, 0);
+        //increment overall score counter
+        score += result;
+
+        Debug.Log(score);
+        //set UI component 
+        scoreUI.GetComponent<Text>().text = score + "%";
+    }
 }
