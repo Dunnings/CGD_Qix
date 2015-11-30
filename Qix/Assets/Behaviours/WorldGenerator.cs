@@ -18,6 +18,7 @@ public class WorldGenerator : MonoBehaviour
     public Texture2D blank;
     public Texture2D white;
     public Texture2D construction;
+    public Texture2D burntTile;
     public GridElement[,] grid = new GridElement[150,75];
 
     private RenderTexture renderTarget;
@@ -127,6 +128,17 @@ public class WorldGenerator : MonoBehaviour
     public void PaintActive(int x, int y)
     {
         DrawTexture(x * 32, (mapHeight - y) * 32, white);
+        //AudioManager.instance.PlaySingle(completeSound);        
+    }
+    public void PaintBurnt(int x, int y)
+    {
+        DrawTexture(x * 32, (mapHeight - y) * 32, burntTile);
+        //AudioManager.instance.PlaySingle(completeSound);        
+    }
+
+    public void PaintInactive(int x, int y)
+    {
+        DrawTexture(x * 32, (mapHeight - y) * 32, blank);
         //AudioManager.instance.PlaySingle(completeSound);        
     }
 
