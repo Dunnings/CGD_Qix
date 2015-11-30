@@ -5,18 +5,33 @@ using System.Collections.Generic;
 
 public class CharMovement : MonoBehaviour
 {
+    //Movement Speed
     public float moveSpeed = 1;
-    // Use this for initialization
-	List<Node> allTheNodes = new List<Node>(), constructionPath = new List<Node>();
-    public GameObject nodeMarker;
-	public bool validUp, validDown, validLeft, validRight, alive = false, drawing = false;
+    //Construction Path
+	List<Node> constructionPath = new List<Node>();
+    //Can I move in a direction
+    public bool validUp, validDown, validLeft, validRight;
+    //Am I alive
+    public bool alive = true;
+    //Am I constructing a path
+    public bool constructing = false;
+    //Controller indexes
 	public int playerIndex = 0, controllerIndex = 0;
+    //States of gamepad
 	GamePadState state, prevState;
+    //Controller axes
     public List<KeyValuePair<int, int>> axis = new List<KeyValuePair<int, int>>();
+    public List<Node> CheckedNodes = new List<Node>();
 
-    List<Node> CheckedNodes = new List<Node>();
+    //Fuse
+    public GameObject fuse;
+    private float fuseWait = 1.0f;
+    private float lastMoveTime = 0f;
+    private int fusePathPosition = 0;
+    private float fuseSpeed = 0.02f;
+    private float fuseTimeLastHitNewNode = 0f;
 	
-	//Input enum, yum yum
+	//Input enum
 	public enum MoveInput {UP, DOWN, LEFT, RIGHT, NULL};
 	//input stack contains the input(s) currently being held down
 	//it works as a stack and updates once an input toggles (from held to released etc)
@@ -25,8 +40,7 @@ public class CharMovement : MonoBehaviour
 	public enum GridLoc {UP, DOWN, LEFT, RIGHT, MID};
 
 	public List<GridLoc> location = new List<GridLoc>();
-
-
+    
 	public MoveInput lastInput;
 
     Node currentNode;
@@ -35,34 +49,65 @@ public class CharMovement : MonoBehaviour
 
     void Start()
     {
-        hitNode(WorldGenerator.Instance.grid[0, 0].m_node);
+        //Hit node start position
+        HitNode(WorldGenerator.Instance.grid[0, 0].m_node);
+
+        fuse.SetActive(false);
 
 		SetLocation ();
     }
 
-    void hitNode(Node inputNode)
+    void HitNode(Node inputNode)
     {
+        //If this node is not the current node
         if (inputNode != currentNode)
         {
+            //Current node is now this node
             currentNode = inputNode;
-            if (inputNode.state == NodeState.inactive && drawing)
+            //If current node state is inactive and we are constructing
+            if (inputNode.state == NodeState.inactive && constructing)
             {
+                //Set this node to constructing
                 inputNode.state = NodeState.construction;
+                //Paint this node
                 WorldGenerator.Instance.PaintConstruction((int)inputNode.position.x, (int)inputNode.position.y);
+                //Add this node to the construction path
                 constructionPath.Add(inputNode);
-                return;
             }
-            //What are the connecting nodes
-            validUp = inputNode.directions[0];
-            validRight = inputNode.directions[1];
-            validDown = inputNode.directions[2];
-            validLeft = inputNode.directions[3];
+            else
+            {
+                //What are the connecting nodes
+                validUp = inputNode.directions[0];
+                validRight = inputNode.directions[1];
+                validDown = inputNode.directions[2];
+                validLeft = inputNode.directions[3];
+            }
         }
     }
 
     // Update is called once per frame
     void Update()
     {
+        if(!alive)
+        {
+            if(constructionPath.Count > 0)
+            {
+                for (int i = 0; i < constructionPath.Count; i++)
+                {
+                    if(constructionPath[i].state == NodeState.construction) {
+                        constructionPath[i].state = NodeState.inactive;
+                        WorldGenerator.Instance.PaintInactive((int)constructionPath[i].position.x, (int)constructionPath[i].position.y);
+                    }
+                }
+                constructionPath.Clear();
+                fusePathPosition = 0;
+            }
+
+            gameObject.SetActive(false);
+            return;
+        }
+
+
         if (!GameManager.instance.noController)
         {
             prevState = state;
@@ -70,7 +115,8 @@ public class CharMovement : MonoBehaviour
         }
 
         switch (GameManager.instance.m_state)
-        {            
+        {
+            #region Menu
             case GameStates.menu:
                 //if not alive and controllers are connected
                 if (!alive && !GameManager.instance.noController)
@@ -79,22 +125,22 @@ public class CharMovement : MonoBehaviour
                 else if (!alive && GameManager.instance.noController)
                     alive = Input.GetKey(KeyCode.Return);
                 break;
+            #endregion
+            #region Game
             case GameStates.game:
                 //If we're on a node, and we can move somewhere else
                 //If a button is pressed to move in the direction of the existing line
                 //Set the current line to the one we should be moving down
-
-
                 if (InputManager.ActionHeld(playerIndex, prevState, state) ||
                     Input.GetKey(KeyCode.Space))
                 {
-                    drawing = true;
+                    constructing = true;
                 }
 
-                else if (drawing && currentNode.state == NodeState.active)
+                else if (constructing && currentNode.state == NodeState.active)
                 {
                     //Touched edge
-                    drawing = false;
+                    constructing = false;
                     constructionPath.Add(currentNode);
                     for (int i = 0; i < constructionPath.Count; i++)
                     {
@@ -201,19 +247,27 @@ public class CharMovement : MonoBehaviour
                     {
                         int areaR = 0;
 
-                        ////calculate the area to the left and to the right
+                        //calculate the area to the left and to the right
                         //calcFloodFill((int)constructionPath[1].position.x + 1, (int)constructionPath[1].position.y, ref areaR, 4);
                         //CheckedNodes.Clear();
 
-                        //if the area to the right is greater
-                        if (areaR > (150*75)-areaR)
+                        ////if the area to the right is greater
+                        //if (areaR > (150*75)-areaR)
+                        //{
+                        //    //flood fill to the left
+                        //    FloodFill((int)constructionPath[1].position.x - 1, (int)constructionPath[1].position.y);
+                        //}
+                        //else
+                        //{
+                        //    //else flood fill to the right
+                        //    FloodFill((int)constructionPath[1].position.x + 1, (int)constructionPath[1].position.y);
+                        //}
+                        if(CanPathToQix((int)constructionPath[1].position.x + 1, (int)constructionPath[1].position.y))
                         {
-                            //flood fill to the left
                             FloodFill((int)constructionPath[1].position.x - 1, (int)constructionPath[1].position.y);
                         }
                         else
                         {
-                            //else flood fill to the right
                             FloodFill((int)constructionPath[1].position.x + 1, (int)constructionPath[1].position.y);
                         }
                     }
@@ -225,32 +279,43 @@ public class CharMovement : MonoBehaviour
                     {
                         int areaU = 0;
 
-                        //calculate the area to the left and to the right
-                        calcFloodFill((int)constructionPath[1].position.x, (int)constructionPath[1].position.y + 1, ref areaU, 4);
-                        CheckedNodes.Clear();
+                        ////calculate the area to the left and to the right
+                        //calcFloodFill((int)constructionPath[1].position.x, (int)constructionPath[1].position.y + 1, ref areaU, 4);
+                        //CheckedNodes.Clear();
 
-                        //if the area to the right is greater
-                        if (areaU > (150 * 75) - areaU)
+                        ////if the area to the right is greater
+                        //if (areaU > (150 * 75) - areaU)
+                        //{
+                        //    //flood fill to the left
+                        //    FloodFill((int)constructionPath[1].position.x, (int)constructionPath[1].position.y - 1);
+                        //}
+                        //else
+                        //{
+                        //    //else flood fill to the right
+                        //    FloodFill((int)constructionPath[1].position.x + 1, (int)constructionPath[1].position.y + 1);
+                        //}
+
+                        if (CanPathToQix((int)constructionPath[1].position.x, (int)constructionPath[1].position.y + 1))
                         {
-                            //flood fill to the left
                             FloodFill((int)constructionPath[1].position.x, (int)constructionPath[1].position.y - 1);
                         }
                         else
                         {
-                            //else flood fill to the right
-                            FloodFill((int)constructionPath[1].position.x + 1, (int)constructionPath[1].position.y + 1);
+                            FloodFill((int)constructionPath[1].position.x, (int)constructionPath[1].position.y - 1);
                         }
                     }
                                       
                     //clear the path 
                     constructionPath.Clear();
+                    fusePathPosition = 0;
                 }
 
 
 
                 if (InputManager.UpHeld(playerIndex, prevState, state))
                 {
-					if (!inputStack.Contains(MoveInput.UP))
+                    lastMoveTime = Time.time;
+                    if (!inputStack.Contains(MoveInput.UP))
 				    {
                 		//add to stack
                 		inputStack.Add(MoveInput.UP);
@@ -264,7 +329,8 @@ public class CharMovement : MonoBehaviour
 		
                 if (InputManager.DownHeld(playerIndex, prevState, state))
                 {
-					if (!inputStack.Contains(MoveInput.DOWN))
+                    lastMoveTime = Time.time;
+                    if (!inputStack.Contains(MoveInput.DOWN))
 					{
 						//add to stack
 						inputStack.Add(MoveInput.DOWN);
@@ -277,7 +343,8 @@ public class CharMovement : MonoBehaviour
 		
                 if (InputManager.LeftHeld(playerIndex, prevState, state))
                 {
-					if (!inputStack.Contains(MoveInput.LEFT))
+                    lastMoveTime = Time.time;
+                    if (!inputStack.Contains(MoveInput.LEFT))
 					{
 						//add to stack
 						inputStack.Add(MoveInput.LEFT);
@@ -290,6 +357,7 @@ public class CharMovement : MonoBehaviour
 
                 if (InputManager.RightHeld(playerIndex, prevState, state))
                 {
+                    lastMoveTime = Time.time;
 					if (!inputStack.Contains(MoveInput.RIGHT))
 					{
 					//add to stack
@@ -304,7 +372,7 @@ public class CharMovement : MonoBehaviour
 				//apply the stack in order & only if valid
 				ApplyMoveInput ();
 
-                if (drawing && constructionPath.Count == 0)
+                if (constructing && constructionPath.Count == 0)
                 {
                     constructionPath.Add(currentNode);
                 }
@@ -313,36 +381,67 @@ public class CharMovement : MonoBehaviour
                 {
                     //Moved right one node
                     Node n = WorldGenerator.Instance.grid[(int)currentNode.position.x + 1, (int)currentNode.position.y].m_node;
-                    hitNode(n);
+                    HitNode(n);
                 }
                 if (Mathf.RoundToInt(transform.position.x + 0.5f) < currentNode.position.x)
                 {
                     //Moved left one node
                     Node n = WorldGenerator.Instance.grid[(int)currentNode.position.x - 1, (int)currentNode.position.y].m_node;
-                    hitNode(n);
+                    HitNode(n);
                 }
                 if (Mathf.RoundToInt(transform.position.y + 0.5f) > currentNode.position.y)
                 {
                     //Moved up one node
                     Node n = WorldGenerator.Instance.grid[(int)currentNode.position.x, (int)currentNode.position.y + 1].m_node;
-                    hitNode(n);
+                    HitNode(n);
                 }
                 if (Mathf.RoundToInt(transform.position.y + 0.5f) < currentNode.position.y)
                 {
                     //Moved left one node
                     Node n = WorldGenerator.Instance.grid[(int)currentNode.position.x, (int)currentNode.position.y - 1].m_node;
-                    hitNode(n);
+                    HitNode(n);
                 }
+
+                #region Fuse
+                if (Time.time - lastMoveTime > fuseWait && constructionPath.Count > 1)
+                {
+                    if (!fuse.activeSelf)
+                    {
+                        fuse.SetActive(true);
+                    }
+                    fuse.transform.position = Vector3.Lerp(constructionPath[fusePathPosition].position, constructionPath[fusePathPosition + 1].position, Time.time - fuseTimeLastHitNewNode / fuseSpeed);
+                    if (Time.time - fuseTimeLastHitNewNode > fuseSpeed)
+                    {
+                        if (fusePathPosition + 2 >= constructionPath.Count)
+                        {
+                            alive = false;
+                            fuse.SetActive(false);
+                            return;
+                        }
+                        WorldGenerator.Instance.PaintBurnt((int)constructionPath[fusePathPosition + 1].position.x, (int)constructionPath[fusePathPosition + 1].position.y);
+                        fuseTimeLastHitNewNode = Time.time;
+                        fusePathPosition++;
+                    }
+                }
+                else
+                {
+                    if (fuse.activeSelf)
+                    {
+                        fuse.SetActive(false);
+                    }
+                }
+                #endregion
+
                 break;
-            case GameStates.paused:
-                break;
+            #endregion
+            #region default
             default:
                 break;
-		}
+                #endregion
+        }
 
-
-
-	}
+        
+    }
 
 	//loop through the list of inputs until a valid one is found
 	//when the first valid movement is found, it is applied and then will not apply another movement
@@ -357,7 +456,7 @@ public class CharMovement : MonoBehaviour
 			switch (inputStack[i])
 			{
 			case MoveInput.UP:
-				if (validUp || (drawing && location.Contains(GridLoc.DOWN)))
+				if (validUp || (constructing && location.Contains(GridLoc.DOWN)))
 				{
 
 					//if vertical movement then allow movement
@@ -367,7 +466,7 @@ public class CharMovement : MonoBehaviour
 					validDown = true;
 					validUp = true;
 
-					if (drawing)
+					if (constructing)
 					{
 						validLeft = true;
 						validRight = true;
@@ -379,7 +478,7 @@ public class CharMovement : MonoBehaviour
 				}
 				break;
 			case MoveInput.DOWN:
-				if (validDown || (drawing && location.Contains(GridLoc.UP)))
+				if (validDown || (constructing && location.Contains(GridLoc.UP)))
 				{
 					transform.Translate(0, -1 * moveSpeed, 0);
 					validLeft = false;
@@ -387,7 +486,7 @@ public class CharMovement : MonoBehaviour
 					validUp = true;
 					validDown = true;
 
-					if (drawing)
+					if (constructing)
 					{
 						validLeft = true;
 						validRight = true;
@@ -399,7 +498,7 @@ public class CharMovement : MonoBehaviour
 				}
 				break;
 			case MoveInput.LEFT:
-				if (validLeft || (drawing && location.Contains(GridLoc.RIGHT)))
+				if (validLeft || (constructing && location.Contains(GridLoc.RIGHT)))
 				{
 					transform.Translate(-1 * moveSpeed, 0, 0);
 					validUp = false;
@@ -407,7 +506,7 @@ public class CharMovement : MonoBehaviour
 					validRight = true;
 					validLeft = true;
 
-					if (drawing)
+					if (constructing)
 					{
 						validUp = true;
 						validRight = false;
@@ -419,7 +518,7 @@ public class CharMovement : MonoBehaviour
 				}
 				break;
 			case MoveInput.RIGHT:
-				if (validRight || (drawing && location.Contains(GridLoc.LEFT)))
+				if (validRight || (constructing && location.Contains(GridLoc.LEFT)))
 				{
 					transform.Translate(1 * moveSpeed, 0, 0);
 					validUp = false;
@@ -427,7 +526,7 @@ public class CharMovement : MonoBehaviour
 					validLeft = true;
 					validRight = true;
 
-					if (drawing)
+					if (constructing)
 					{
 						validLeft = false;
 						validUp = true;
@@ -501,6 +600,23 @@ public class CharMovement : MonoBehaviour
         {
             calcFloodFill(x, y - 1, ref area, 2);
         }
+    }
+
+    bool CanPathToQix(int x, int y)
+    {
+        Vector2 QixPos = new Vector2(75, 30);
+        
+        RaycastHit2D[] hits = Physics2D.RaycastAll(new Vector2(x, y), QixPos - new Vector2(x, y));
+        Debug.DrawLine(new Vector3(x, y, 10f), new Vector3(QixPos.x, QixPos.y, 10f), Color.blue);
+        int count = 0;
+        for (int i = 0; i < hits.Length; i++)
+        {
+            if (constructionPath.Contains(hits[i].collider.transform.GetComponent<GridElement>().m_node))
+            {
+                count++;
+            }
+        }
+        return count % 2 != 0;
     }
 
     void FloodFill(int x, int y)
