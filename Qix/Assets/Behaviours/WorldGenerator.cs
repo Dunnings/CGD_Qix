@@ -36,11 +36,7 @@ public class WorldGenerator : MonoBehaviour
         {
             for (int y = 0; y < mapHeight; y++)
             {
-                GameObject go = new GameObject();
-                go.AddComponent<BoxCollider2D>();
-                go.transform.position = new Vector3(x, y, 0f);
-                go.AddComponent<GridElement>();
-                GridElement gridElement = go.GetComponent<GridElement>();
+                GridElement gridElement = new GridElement();
                 //gridElement.name = x + " - " + y;
 
                 gridElement.m_pos = new Vector2(x, y);
@@ -52,20 +48,20 @@ public class WorldGenerator : MonoBehaviour
                     gridElement.m_node.directions[2] = true;
                     gridElement.m_node.state = NodeState.active;
                 }
-                if (y == 1 || y == mapHeight-1)
+                if (y == 0 || y == mapHeight-1)
                 {
                     gridElement.m_node.directions[1] = true;
                     gridElement.m_node.directions[3] = true;
                     gridElement.m_node.state = NodeState.active;
                 }
-                if (x == 0 && y == 1)
+                if (x == 0 && y == 0)
                 {
                     gridElement.m_node.directions[0] = true;
                     gridElement.m_node.directions[1] = true;
                     gridElement.m_node.directions[2] = false;
                     gridElement.m_node.directions[3] = false;
                 }
-                if (x == mapWidth - 1 && y == 1)
+                if (x == mapWidth - 1 && y == 0)
                 {
                     gridElement.m_node.directions[0] = true;
                     gridElement.m_node.directions[1] = false;
@@ -91,11 +87,11 @@ public class WorldGenerator : MonoBehaviour
                 if (gridElement.m_node.state == NodeState.active)
                 {
 
-                    DrawTexture(x * 32, (mapHeight - y) * 32, white);
+                    DrawTexture(x * 32 , (mapHeight - y) * 32 , white);
                 }
                 else
                 {
-                    DrawTexture(x * 32, (mapHeight - y) * 32, blank);
+                    DrawTexture(x * 32 , (mapHeight - y) * 32 , blank);
                 }
             }            
         }
@@ -127,22 +123,22 @@ public class WorldGenerator : MonoBehaviour
     }
     public void PaintConstruction(int x, int y)
     {
-        DrawTexture(x * 32, (mapHeight - y) * 32, construction);
+        DrawTexture(x * 32 , (mapHeight - y) * 32 , construction);
     }
     public void PaintActive(int x, int y)
     {
-        DrawTexture(x * 32, (mapHeight - y) * 32, white);
+        DrawTexture(x * 32 , (mapHeight - y) * 32 , white);
         //AudioManager.instance.PlaySingle(completeSound);        
     }
     public void PaintBurnt(int x, int y)
     {
-        DrawTexture(x * 32, (mapHeight - y) * 32, burntTile);
+        DrawTexture(x * 32 , (mapHeight - y) * 32 , burntTile);
         //AudioManager.instance.PlaySingle(completeSound);        
     }
 
     public void PaintInactive(int x, int y)
     {
-        DrawTexture(x * 32, (mapHeight - y) * 32, blank);
+        DrawTexture(x * 32 , (mapHeight - y) * 32 , blank);
         //AudioManager.instance.PlaySingle(completeSound);        
     }
 

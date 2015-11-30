@@ -8,7 +8,8 @@ public class CharMovement : MonoBehaviour
     //Movement Speed
     public float moveSpeed = 1;
     //Construction Path
-	List<Node> constructionPath = new List<Node>();
+    List<Node> constructionPath = new List<Node>();
+    List<Node> constructionPathCorners = new List<Node>();
     //Can I move in a direction
     public bool validUp, validDown, validLeft, validRight;
     //Am I alive
@@ -23,6 +24,8 @@ public class CharMovement : MonoBehaviour
     //Controller axes
     public List<KeyValuePair<int, int>> axis = new List<KeyValuePair<int, int>>();
     public List<Node> CheckedNodes = new List<Node>();
+
+    private Vector3 lastDir = Vector3.zero;
 
     //Fuse
     public GameObject fuse;
@@ -74,6 +77,19 @@ public class CharMovement : MonoBehaviour
                 WorldGenerator.Instance.PaintConstruction((int)inputNode.position.x, (int)inputNode.position.y);
                 //Add this node to the construction path
                 constructionPath.Add(inputNode);
+                if(constructionPathCorners.Count == 0)
+                {
+                    constructionPathCorners.Add(inputNode);
+                }
+                else if (constructionPath.Count > 3)
+                {
+                    Vector3 direction = (constructionPath[constructionPath.Count - 2].position - constructionPath[constructionPath.Count - 1].position).normalized;
+                    Vector3 prevDirection = (constructionPath[constructionPath.Count - 3].position - constructionPath[constructionPath.Count - 2].position).normalized;
+                    if (prevDirection != direction)
+                    {
+                        constructionPathCorners.Add(inputNode);
+                    }
+                }
             }
             else
             {
@@ -101,6 +117,7 @@ public class CharMovement : MonoBehaviour
                     }
                 }
                 constructionPath.Clear();
+                constructionPathCorners.Clear();
                 fusePathPosition = 0;
             }
 
@@ -143,6 +160,8 @@ public class CharMovement : MonoBehaviour
                     //Touched edge
                     constructing = false;
                     constructionPath.Add(currentNode);
+                    constructionPathCorners.Add(currentNode);
+
                     for (int i = 0; i < constructionPath.Count; i++)
                     {
                         //perform flood fill
@@ -157,7 +176,6 @@ public class CharMovement : MonoBehaviour
                                 //Moved left
                                 constructionPath[i - 1].directions[3] = true;
                                 constructionPath[i].directions[1] = true;
-                                Debug.Log(constructionPath[i].position.x + " " + constructionPath[i].position.y);
                             }
                             else if (constructionPath[i - 1].position.x < constructionPath[i].position.x)
                             {
@@ -246,7 +264,8 @@ public class CharMovement : MonoBehaviour
                     if ((int)constructionPath[1].position.y > (int)constructionPath[0].position.y ||
                         (int)constructionPath[1].position.y < (int)constructionPath[0].position.y)
                     {
-                        int areaR = 0;
+                        Debug.Log("UP/DOWN");
+                        //int areaR = 0;
 
                         //calculate the area to the left and to the right
                         //calcFloodFill((int)constructionPath[1].position.x + 1, (int)constructionPath[1].position.y, ref areaR, 4);
@@ -263,7 +282,7 @@ public class CharMovement : MonoBehaviour
                         //    //else flood fill to the right
                         //    FloodFill((int)constructionPath[1].position.x + 1, (int)constructionPath[1].position.y);
                         //}
-                        if(CanPathToQix((int)constructionPath[1].position.x + 1, (int)constructionPath[1].position.y))
+                        if(CanPathToQix(constructionPath[1].position.x + 1, constructionPath[1].position.y))
                         {
                             FloodFill((int)constructionPath[1].position.x - 1, (int)constructionPath[1].position.y);
                         }
@@ -278,7 +297,8 @@ public class CharMovement : MonoBehaviour
                     else if ((int)constructionPath[1].position.x > (int)constructionPath[0].position.x ||
                         (int)constructionPath[1].position.x < (int)constructionPath[0].position.x)
                     {
-                        int areaU = 0;
+                        Debug.Log("LEFT/RIGHT");
+                        //int areaU = 0;
 
                         ////calculate the area to the left and to the right
                         //calcFloodFill((int)constructionPath[1].position.x, (int)constructionPath[1].position.y + 1, ref areaU, 4);
@@ -295,19 +315,20 @@ public class CharMovement : MonoBehaviour
                         //    //else flood fill to the right
                         //    FloodFill((int)constructionPath[1].position.x + 1, (int)constructionPath[1].position.y + 1);
                         //}
-
-                        if (CanPathToQix((int)constructionPath[1].position.x, (int)constructionPath[1].position.y + 1))
+                        Debug.Log(constructionPath[0].position + " _ " + constructionPath[1].position);
+                        if (CanPathToQix(constructionPath[1].position.x, constructionPath[1].position.y + 1))
                         {
                             FloodFill((int)constructionPath[1].position.x, (int)constructionPath[1].position.y - 1);
                         }
                         else
                         {
-                            FloodFill((int)constructionPath[1].position.x, (int)constructionPath[1].position.y - 1);
+                            FloodFill((int)constructionPath[1].position.x, (int)constructionPath[1].position.y + 1);
                         }
                     }
                                       
                     //clear the path 
                     constructionPath.Clear();
+                    constructionPathCorners.Clear();
                     fusePathPosition = 0;
                 }
 
@@ -602,27 +623,42 @@ public class CharMovement : MonoBehaviour
             calcFloodFill(x, y - 1, ref area, 2);
         }
     }
-
-    bool CanPathToQix(int x, int y)
+    bool CanPathToQix(float x, float y)
     {
-        Vector2 QixPos = new Vector2(75, 30);
-        
-        RaycastHit2D[] hits = Physics2D.RaycastAll(new Vector2(x, y), QixPos - new Vector2(x, y));
-        Debug.DrawLine(new Vector3(x, y, 10f), new Vector3(QixPos.x, QixPos.y, 10f), Color.blue);
+        Vector2 QixPos = new Vector2(75, 37);
         int count = 0;
-        for (int i = 0; i < hits.Length; i++)
+        for (int i = 1; i < constructionPathCorners.Count; i++)
         {
-            if (constructionPath.Contains(hits[i].collider.transform.GetComponent<GridElement>().m_node))
+            Debug.Log(constructionPathCorners[i].position);
+            if (intersection(QixPos.x, QixPos.y, x,y, constructionPathCorners[i].position.x, constructionPathCorners[i].position.y, constructionPathCorners[i-1].position.x, constructionPathCorners[i-1].position.y))
             {
                 count++;
             }
         }
-        return count % 2 != 0;
+        Debug.Log("Intersections: "+ count);
+        return count % 2 != 0 || count == 0;
     }
+
+    bool intersection(float x1, float y1, float x2, float y2, float x3, float y3, float x4, float y4)
+    {
+        Debug.DrawLine(new Vector3(x1, y1, 0f), new Vector3(x2, y2, 0f), Color.blue, 60f);
+        Debug.DrawLine(new Vector3(x3, y3, 0f), new Vector3(x4, y4, 0f), Color.green, 60f);
+        float d = (x1 - x2) * (y3 - y4) - (y1 - y2) * (x3 - x4);
+        if (d == 0) return false;
+        float xi = ((x3 - x4) * (x1 * y2 - y1 * x2) - (x1 - x2) * (x3 * y4 - y3 * x4)) / d;
+        float yi = ((y3 - y4) * (x1 * y2 - y1 * x2) - (y1 - y2) * (x3 * y4 - y3 * x4)) / d;
+        if (x3 == x4) {
+            if (yi < Mathf.Min(y1, y2) || yi > Mathf.Max(y1, y2)) return false;
+        }
+        Vector2 p = new Vector2(xi, yi);
+        if (xi < Mathf.Min(x1, x2) || xi > Mathf.Max(x1, x2)) return false;
+        if (xi < Mathf.Min(x3, x4) || xi > Mathf.Max(x3, x4)) return false;
+        return true;
+ }
 
     void FloodFill(int x, int y)
     {
-        if (x < 1 || x > 148 || y < 1 || y > 74)
+        if (x < 0 || x > 149 || y < 1 || y > 74)
         {
             return;
         }
