@@ -13,6 +13,7 @@ public class CharMovement : MonoBehaviour
     public bool validUp, validDown, validLeft, validRight;
     //Am I alive
     public bool alive = true;
+    public bool joined = false;
     //Am I constructing a path
     public bool constructing = false;
     //Controller indexes
@@ -119,11 +120,11 @@ public class CharMovement : MonoBehaviour
             #region Menu
             case GameStates.menu:
                 //if not alive and controllers are connected
-                if (!alive && !GameManager.instance.noController)
-                    alive = InputManager.SetUpPlayers(playerIndex, prevState, state);
-                //else if not alive and keyboard
-                else if (!alive && GameManager.instance.noController)
-                    alive = Input.GetKey(KeyCode.Return);
+                if (!joined && !GameManager.instance.noController)
+                    joined = InputManager.SetUpPlayers(playerIndex, prevState, state);
+                //else if not spawned and keyboard
+                else if (!joined && GameManager.instance.noController)
+                    joined = Input.GetKey(KeyCode.Return);
                 break;
             #endregion
             #region Game

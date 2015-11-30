@@ -95,7 +95,7 @@ public class GameManager : MonoBehaviour
                         playerUIElements[i].GetComponentInChildren<Image>() == true)
                     {
                         //if that player has joined
-                        if (_players[i].GetComponent<CharMovement>().alive &&
+                        if (_players[i].GetComponent<CharMovement>().joined &&
                             playerUIElements[i].GetComponentInChildren<Image>().color != Color.white)
                         {
                             //get UI element colour
@@ -127,7 +127,7 @@ public class GameManager : MonoBehaviour
                     for (int i = 0; i < _players.Count; i++)
                     {
                         //if player hasn't joined
-                        if (!_players[i].GetComponent<CharMovement>().alive)
+                        if (!_players[i].GetComponent<CharMovement>().joined)
                         {
                             //set instance inactive if not joined
                             _players[i].SetActive(false);
