@@ -63,7 +63,7 @@ public class CharMovement : MonoBehaviour
 
         fuse.SetActive(false);
 
-		SetLocation ();
+		//SetLocation ();
     }
 
     void HitNode(Node inputNode)
@@ -79,7 +79,7 @@ public class CharMovement : MonoBehaviour
                 //Set this node to constructing
                 inputNode.state = NodeState.construction;
                 //Paint this node
-                WorldGenerator.Instance.PaintConstruction((int)inputNode.position.x, (int)inputNode.position.y);
+                WorldGenerator.Instance.PaintConstruction((int)inputNode.position.x, (int)inputNode.position.y, playerIndex);
                 //Add this node to the construction path
                 constructionPath.Add(inputNode);
 
@@ -188,10 +188,13 @@ public class CharMovement : MonoBehaviour
                                 constructionPath[i - 1].directions[0] = true;
                             }
                         }
-
-                        WorldGenerator.Instance.PaintActive((int)constructionPath[i].position.x, (int)constructionPath[i].position.y);
+                        if (i != 0 && i != constructionPath.Count - 1)
+                        {
+                            WorldGenerator.Instance.PaintActive((int)constructionPath[i].position.x, (int)constructionPath[i].position.y, playerIndex);
+                        }
 
                     }
+
                     //CORNER GENERATION
                     constructionPathCorners.Add(constructionPath[0]);
                     for (int i = 2; i < constructionPath.Count; i++)
@@ -420,7 +423,7 @@ public class CharMovement : MonoBehaviour
 	//when the first valid movement is found, it is applied and then will not apply another movement
 	void ApplyMoveInput ()
 	{
-		SetLocation ();
+		//SetLocation ();
 
 		for (int i = 0; i < inputStack.Count; i++)
 		{
@@ -429,7 +432,7 @@ public class CharMovement : MonoBehaviour
 			switch (inputStack[i])
 			{
 			case MoveInput.UP:
-				if (validUp || (constructing && location.Contains(GridLoc.DOWN)))
+				if (validUp || (constructing && !validUp))
 				{
 
 					//if vertical movement then allow movement
@@ -451,7 +454,7 @@ public class CharMovement : MonoBehaviour
 				}
 				break;
 			case MoveInput.DOWN:
-				if (validDown || (constructing && location.Contains(GridLoc.UP)))
+				if (validDown || (constructing && !validDown))
 				{
 					transform.Translate(0, -1 * moveSpeed, 0);
 					validLeft = false;
@@ -471,7 +474,7 @@ public class CharMovement : MonoBehaviour
 				}
 				break;
 			case MoveInput.LEFT:
-				if (validLeft || (constructing && location.Contains(GridLoc.RIGHT)))
+				if (validLeft || (constructing && !validLeft))
 				{
 					transform.Translate(-1 * moveSpeed, 0, 0);
 					validUp = false;
@@ -491,7 +494,7 @@ public class CharMovement : MonoBehaviour
 				}
 				break;
 			case MoveInput.RIGHT:
-				if (validRight || (constructing && location.Contains(GridLoc.LEFT)))
+				if (validRight || (constructing && !validRight))
 				{
 					transform.Translate(1 * moveSpeed, 0, 0);
 					validUp = false;
@@ -604,7 +607,7 @@ public class CharMovement : MonoBehaviour
                 
         WorldGenerator.Instance.grid[x, y].m_node.state = NodeState.active;
 
-        WorldGenerator.Instance.PaintActive(x, y);
+        WorldGenerator.Instance.PaintActive(x, y, playerIndex);
         area++;
 
         FloodFill(x + 1, y, ref area);  
@@ -614,32 +617,32 @@ public class CharMovement : MonoBehaviour
     }
 
 	//finds where the character is in the grid and then adds
-	void SetLocation ()
-	{
-		bool notEdgeX = false;
+	//void SetLocation ()
+	//{
+	//	bool notEdgeX = false;
 
-		location.Clear ();
+	//	location.Clear ();
 
-		//find where in the grid the player is
-		if (currentNode.position.x == 0) {
-			location.Add (GridLoc.LEFT);
-		} else if (currentNode.position.x == 149) {
-			location.Add (GridLoc.RIGHT);
-		} else {
-			notEdgeX = true;
-		}
+	//	//find where in the grid the player is
+	//	if (currentNode.position.x == 0) {
+	//		location.Add (GridLoc.LEFT);
+	//	} else if (currentNode.position.x == 149) {
+	//		location.Add (GridLoc.RIGHT);
+	//	} else {
+	//		notEdgeX = true;
+	//	}
 
-		if (currentNode.position.y == 1) {
-			location.Add (GridLoc.DOWN);
-		} else if (currentNode.position.y == 74) {
-			location.Add (GridLoc.UP);
-		} else {
-			if (notEdgeX)
-			{
-				location.Add(GridLoc.MID);
-			}
-		}
-	}
+	//	if (currentNode.position.y == 1) {
+	//		location.Add (GridLoc.DOWN);
+	//	} else if (currentNode.position.y == 74) {
+	//		location.Add (GridLoc.UP);
+	//	} else {
+	//		if (notEdgeX)
+	//		{
+	//			location.Add(GridLoc.MID);
+	//		}
+	//	}
+	//}
 
     /// <summary>
     /// called after an area is filled
