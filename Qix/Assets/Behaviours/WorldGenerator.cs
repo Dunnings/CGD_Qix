@@ -31,15 +31,22 @@ public class WorldGenerator : MonoBehaviour
     {
         Instance = this;
         InitialiseTextureUpdater();
-
+        GameObject parent = new GameObject();
+        parent.name = "Nodes";
         for (int x = 0; x < mapWidth; x++)
         {
             for (int y = 0; y < mapHeight; y++)
             {
-                GridElement gridElement = new GridElement();
+
+                GameObject go = new GameObject();
+                go.AddComponent<BoxCollider2D>();
+                go.transform.position = new Vector3(x+0.5f, y+0.5f, 0f);
+                go.AddComponent<GridElement>();
+                go.transform.SetParent(parent.transform);
+                GridElement gridElement = go.GetComponent<GridElement>();
                 //gridElement.name = x + " - " + y;
 
-                gridElement.m_pos = new Vector2(x, y);
+                gridElement.m_pos = new Vector2(x+0.5f, y+0.5f);
                 gridElement.m_node = new Node();
                 gridElement.m_node.position = new Vector3(x, y, 0);
                 if(x == 0 || x == mapWidth-1)

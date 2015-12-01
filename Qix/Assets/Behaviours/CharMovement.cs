@@ -82,19 +82,7 @@ public class CharMovement : MonoBehaviour
                 WorldGenerator.Instance.PaintConstruction((int)inputNode.position.x, (int)inputNode.position.y);
                 //Add this node to the construction path
                 constructionPath.Add(inputNode);
-                if(constructionPathCorners.Count == 0)
-                {
-                    constructionPathCorners.Add(inputNode);
-                }
-                else if (constructionPath.Count > 3)
-                {
-                    Vector3 direction = (constructionPath[constructionPath.Count - 2].position - constructionPath[constructionPath.Count - 1].position).normalized;
-                    Vector3 prevDirection = (constructionPath[constructionPath.Count - 3].position - constructionPath[constructionPath.Count - 2].position).normalized;
-                    if (prevDirection != direction)
-                    {
-                        constructionPathCorners.Add(inputNode);
-                    }
-                }
+
             }
             else
             {
@@ -165,7 +153,6 @@ public class CharMovement : MonoBehaviour
                     //Touched edge
                     constructing = false;
                     constructionPath.Add(currentNode);
-                    constructionPathCorners.Add(currentNode);
 
                     for (int i = 0; i < constructionPath.Count; i++)
                     {
@@ -203,67 +190,23 @@ public class CharMovement : MonoBehaviour
                         }
 
                         WorldGenerator.Instance.PaintActive((int)constructionPath[i].position.x, (int)constructionPath[i].position.y);
-                        
+
                     }
-
-                    ////if the end point of the paths y is greater than the starting path pos
-                    //if ((int)constructionPath[constructionPath.Count - 1].position.y > (int)constructionPath[0].position.y &&
-                    //    (int)constructionPath[constructionPath.Count - 1].position.x == (int)constructionPath[0].position.x)
-                    //{
-                    //    //start filling from the 1 path pos up
-                    //    floodFill((int)constructionPath[1].position.x, (int)constructionPath[1].position.y + 1, 1);
-                    //}
-                    ////else if the end point of the paths y is less than the starting path pos
-                    //else if ((int)constructionPath[constructionPath.Count - 1].position.y < (int)constructionPath[0].position.y &&
-                    //    (int)constructionPath[constructionPath.Count - 1].position.x == (int)constructionPath[0].position.x)
-                    //{
-                    //    //start filling downwards
-                    //    floodFill((int)constructionPath[1].position.x, (int)constructionPath[1].position.y - 1, 1);
-                    //}
-
-                    ////x axis
-                    //else if ((int)constructionPath[constructionPath.Count - 1].position.x > (int)constructionPath[0].position.x &&
-                    //    (int)constructionPath[constructionPath.Count - 1].position.y == (int)constructionPath[0].position.y)
-                    //{
-                    //    floodFill((int)constructionPath[1].position.x+1, (int)constructionPath[1].position.y, 1);
-                    //}
-                    //else if ((int)constructionPath[constructionPath.Count - 1].position.x < (int)constructionPath[0].position.x &&
-                    //    (int)constructionPath[constructionPath.Count - 1].position.y == (int)constructionPath[0].position.y)
-                    //{
-                    //    floodFill((int)constructionPath[1].position.x-1, (int)constructionPath[1].position.y, 1);
-                    //}
-
-                    
-                    //else if ((int)constructionPath[constructionPath.Count - 1].position.y > (int)constructionPath[0].position.y &&
-                    //    (int)constructionPath[constructionPath.Count - 1].position.x < (int)constructionPath[0].position.x)
-                    //{
-                    //    floodFill((int)constructionPath[1].position.x - 1, (int)constructionPath[1].position.y, 1);
-                    //}
-                    //else if ((int)constructionPath[constructionPath.Count - 1].position.y > (int)constructionPath[0].position.y &&
-                    //(int)constructionPath[constructionPath.Count - 1].position.x > (int)constructionPath[0].position.x)
-                    //{
-                    //    floodFill((int)constructionPath[1].position.x + 1, (int)constructionPath[1].position.y + 1, 1);
-                    //}
-
-
-                    //else if ((int)constructionPath[constructionPath.Count - 1].position.y < (int)constructionPath[0].position.y &&
-                    //   (int)constructionPath[constructionPath.Count - 1].position.x > (int)constructionPath[0].position.x)
-                    //{
-                    //    if ((int)constructionPath[constructionPath.Count - 2].x)
-                    //    floodFill((int)constructionPath[1].position.x +1, (int)constructionPath[1].position.y-1, 1);
-                    //}
-
-                    //else if ((int)constructionPath[constructionPath.Count - 1].position.y > (int)constructionPath[0].position.y &&
-                    //   (int)constructionPath[constructionPath.Count - 1].position.x > (int)constructionPath[0].position.x)
-                    //{
-                    //    floodFill((int)constructionPath[1].position.x -1, (int)constructionPath[1].position.y, 1);
-                    //}
-
-                    //else if ((int)constructionPath[constructionPath.Count - 1].position.y < (int)constructionPath[0].position.y &&
-                    //  (int)constructionPath[constructionPath.Count - 1].position.x < (int)constructionPath[0].position.x)
-                    //{
-                    //    floodFill((int)constructionPath[1].position.x, (int)constructionPath[1].position.y-1, 1);
-                    //}
+                    //CORNER GENERATION
+                    constructionPathCorners.Add(constructionPath[0]);
+                    for (int i = 2; i < constructionPath.Count; i++)
+                    {
+                        //A B C D
+                        //C - D = direction
+                        //C - B = prevDirection
+                        Vector3 direction = (constructionPath[i - 1].position - constructionPath[i].position).normalized;
+                        Vector3 prevDirection = (constructionPath[i - 2].position - constructionPath[i - 1].position).normalized;
+                        if (prevDirection != direction)
+                        {
+                            constructionPathCorners.Add(constructionPath[i-1]);
+                        }
+                    }
+                    constructionPathCorners.Add(constructionPath[constructionPath.Count - 1]);
 
                     //Going up or down
                     if ((int)constructionPath[1].position.y > (int)constructionPath[0].position.y ||
@@ -288,12 +231,12 @@ public class CharMovement : MonoBehaviour
                         //}
                         if(CanPathToQix(constructionPath[1].position.x + 1, constructionPath[1].position.y))
                         {
-                            FloodFill((int)constructionPath[1].position.x - 1, (int)constructionPath[1].position.y, ref area);
+                            FloodFill((int)constructionPath[1].position.x + 1, (int)constructionPath[1].position.y, ref area);
                             UpdateScore(area);
                         }
                         else
                         {
-                            FloodFill((int)constructionPath[1].position.x + 1, (int)constructionPath[1].position.y, ref area);
+                            FloodFill((int)constructionPath[1].position.x - 1, (int)constructionPath[1].position.y, ref area);
                             UpdateScore(area);
                         }
                     }
@@ -323,7 +266,7 @@ public class CharMovement : MonoBehaviour
                         Debug.Log(constructionPath[0].position + " _ " + constructionPath[1].position);
                         if (CanPathToQix(constructionPath[1].position.x, constructionPath[1].position.y + 1))
                         {
-                            FloodFill((int)constructionPath[1].position.x, (int)constructionPath[1].position.y - 1, ref area);
+                            FloodFill((int)constructionPath[1].position.x, (int)constructionPath[1].position.y + 1, ref area);
                             UpdateScore(area);
                         }
                         else
@@ -636,14 +579,16 @@ public class CharMovement : MonoBehaviour
         int count = 0;
         for (int i = 1; i < constructionPathCorners.Count; i++)
         {
-            Debug.Log(constructionPathCorners[i].position);
-            if (intersection(QixPos.x, QixPos.y, x,y, constructionPathCorners[i].position.x, constructionPathCorners[i].position.y, constructionPathCorners[i-1].position.x, constructionPathCorners[i-1].position.y))
+            WorldGenerator.Instance.PaintBurnt((int)constructionPathCorners[i].position.x, (int)constructionPathCorners[i].position.y);
+            Debug.DrawLine(new Vector2(QixPos.x, QixPos.y), new Vector2(x, y), Color.blue, 60f);
+            Debug.DrawLine(new Vector2(constructionPathCorners[i].position.x, constructionPathCorners[i].position.y), new Vector2(constructionPathCorners[i - 1].position.x, constructionPathCorners[i - 1].position.y), Color.blue, 60f);
+            if (Intersect(new Point(QixPos.x, QixPos.y), new Point(x,y), new Point(constructionPathCorners[i].position.x, constructionPathCorners[i].position.y), new Point(constructionPathCorners[i-1].position.x, constructionPathCorners[i-1].position.y)))
             {
                 count++;
             }
         }
         Debug.Log("Intersections: "+ count);
-        return count % 2 != 0 || count == 0;
+        return count % 2 != 0;
     }
 
     void FloodFill(int x, int y, ref int area)
@@ -714,21 +659,87 @@ public class CharMovement : MonoBehaviour
         scoreUI.GetComponent<Text>().text = score + "%";
     }
 
-    bool intersection(float x1, float y1, float x2, float y2, float x3, float y3, float x4, float y4)
+    //bool Intersection(float x1, float y1, float x2, float y2, float x3, float y3, float x4, float y4)
+    //{
+    //    Debug.DrawLine(new Vector3(x1, y1, 0f), new Vector3(x2, y2, 0f), Color.blue, 60f);
+    //    Debug.DrawLine(new Vector3(x3, y3, 0f), new Vector3(x4, y4, 0f), Color.green, 60f);
+    //    float d = (x1 - x2) * (y3 - y4) - (y1 - y2) * (x3 - x4);
+    //    if (d == 0) return false;
+    //    float xi = ((x3 - x4) * (x1 * y2 - y1 * x2) - (x1 - x2) * (x3 * y4 - y3 * x4)) / d;
+    //    float yi = ((y3 - y4) * (x1 * y2 - y1 * x2) - (y1 - y2) * (x3 * y4 - y3 * x4)) / d;
+    //    if (x3 == x4)
+    //    {
+    //        if (yi < Mathf.Min(y1, y2) || yi > Mathf.Max(y1, y2)) return false;
+    //    }
+    //    Vector2 p = new Vector2(xi, yi);
+    //    if (xi < Mathf.Min(x1, x2) || xi > Mathf.Max(x1, x2)) return false;
+    //    if (xi < Mathf.Min(x3, x4) || xi > Mathf.Max(x3, x4)) return false;
+    //    return true;
+    //}
+
+    int orientation(Point p, Point q, Point r)
     {
-        Debug.DrawLine(new Vector3(x1, y1, 0f), new Vector3(x2, y2, 0f), Color.blue, 60f);
-        Debug.DrawLine(new Vector3(x3, y3, 0f), new Vector3(x4, y4, 0f), Color.green, 60f);
-        float d = (x1 - x2) * (y3 - y4) - (y1 - y2) * (x3 - x4);
-        if (d == 0) return false;
-        float xi = ((x3 - x4) * (x1 * y2 - y1 * x2) - (x1 - x2) * (x3 * y4 - y3 * x4)) / d;
-        float yi = ((y3 - y4) * (x1 * y2 - y1 * x2) - (y1 - y2) * (x3 * y4 - y3 * x4)) / d;
-        if (x3 == x4)
+        int val = (q.y - p.y) * (r.x - q.x) -
+                  (q.x - p.x) * (r.y - q.y);
+
+        if (val == 0) return 0;  // colinear
+
+        return (val > 0) ? 1 : 2; // clock or counterclock wise
+    }
+
+    bool Intersect(Point p1, Point q1, Point p2, Point q2)
+    {
+        // Find the four orientations needed for general and
+        // special cases
+        int o1 = orientation(p1, q1, p2);
+        int o2 = orientation(p1, q1, q2);
+        int o3 = orientation(p2, q2, p1);
+        int o4 = orientation(p2, q2, q1);
+
+        // General case
+        if (o1 != o2 && o3 != o4)
+            return true;
+
+        // Special Cases
+        // p1, q1 and p2 are colinear and p2 lies on segment p1q1
+        if (o1 == 0 && onSegment(p1, p2, q1)) return true;
+
+        // p1, q1 and p2 are colinear and q2 lies on segment p1q1
+        if (o2 == 0 && onSegment(p1, q2, q1)) return true;
+
+        // p2, q2 and p1 are colinear and p1 lies on segment p2q2
+        if (o3 == 0 && onSegment(p2, p1, q2)) return true;
+
+        // p2, q2 and q1 are colinear and q1 lies on segment p2q2
+        if (o4 == 0 && onSegment(p2, q1, q2)) return true;
+
+        return false; // Doesn't fall in any of the above cases
+    }
+
+    // Given three colinear points p, q, r, the function checks if
+    // point q lies on line segment 'pr'
+    bool onSegment(Point p, Point q, Point r)
+    {
+        if (q.x <= Mathf.Max(p.x, r.x) && q.x >= Mathf.Min(p.x, r.x) &&
+            q.y <= Mathf.Max(p.y, r.y) && q.y >= Mathf.Min(p.y, r.y))
+            return true;
+
+        return false;
+    }
+
+    class Point
+    {
+        public Point(int _x, int _y)
         {
-            if (yi < Mathf.Min(y1, y2) || yi > Mathf.Max(y1, y2)) return false;
+            x = _x;
+            y = _y;
         }
-        Vector2 p = new Vector2(xi, yi);
-        if (xi < Mathf.Min(x1, x2) || xi > Mathf.Max(x1, x2)) return false;
-        if (xi < Mathf.Min(x3, x4) || xi > Mathf.Max(x3, x4)) return false;
-        return true;
+        public Point(float _x, float _y)
+        {
+            x = (int)_x;
+            y = (int)_y;
+        }
+        public int x;
+        public int y;
     }
 }

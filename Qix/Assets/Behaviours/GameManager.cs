@@ -72,7 +72,9 @@ public class GameManager : MonoBehaviour
             _players[0].GetComponent<CharMovement>().playerIndex = 0;
             _players[0].GetComponent<CharMovement>().controllerIndex = 0;
         }
-
+        worldCanvas.SetActive(true);
+        menuCanvas.SetActive(true);
+        uiCanvas.SetActive(false);
         //set state to menu
         m_state = GameStates.menu;
 	}
@@ -83,9 +85,9 @@ public class GameManager : MonoBehaviour
         {
             case GameStates.menu:
                 //set up UI
-                worldCanvas.SetActive(true);
-                menuCanvas.SetActive(true);
-                uiCanvas.SetActive(false);
+                //worldCanvas.SetActive(true);
+                //menuCanvas.SetActive(true);
+                //uiCanvas.SetActive(false);
 
                 //in char select loop over max amount of active players
                 for (int i = 0; i < _players.Count; i++)
@@ -117,6 +119,9 @@ public class GameManager : MonoBehaviour
                 if(Input.GetKey(KeyCode.L)
                     && creditsInt< 64)
                 {
+                    worldCanvas.SetActive(true);
+                    menuCanvas.SetActive(false);
+                    uiCanvas.SetActive(true);
                     //set game state
                     m_state = GameStates.game;
 
@@ -140,9 +145,7 @@ public class GameManager : MonoBehaviour
                 }
                 break;
             case GameStates.game:
-                worldCanvas.SetActive(true);
-                menuCanvas.SetActive(false);
-                uiCanvas.SetActive(true);
+                
                 break;
             case GameStates.paused:
                 break;
