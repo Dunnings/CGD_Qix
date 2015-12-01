@@ -83,6 +83,20 @@ public class CharMovement : MonoBehaviour
                 WorldGenerator.Instance.PaintConstruction((int)inputNode.position.x, (int)inputNode.position.y, playerIndex);
                 //Add this node to the construction path
                 constructionPath.Add(inputNode);
+
+				GameObject node = new GameObject();
+				node.transform.position = new Vector3(inputNode.position.x, inputNode.position.y, 0f);
+				node.tag = "Node";
+				
+				node.AddComponent<BoxCollider2D>();
+				node.GetComponent<BoxCollider2D>().offset = new Vector2(0.5f, 0.5f);
+				node.GetComponent<BoxCollider2D>().isTrigger = true;
+
+				//node.AddComponent<Node>();
+				//node.GetComponent<Node>().Equals(inputNode);
+
+
+				//
             }
             else
             {

@@ -7,7 +7,7 @@
 using UnityEngine;
 using System.Collections;
 
-public class GridElement : MonoBehaviour
+public class GridElement 
 {	
     public Node m_node = null;
     public Vector2 m_pos = Vector2.zero;
