@@ -213,27 +213,29 @@ public class GameManager : MonoBehaviour
 
                     m_state = GameStates.gameOver;
                 }
-
-                if(joinedPlayers - spawnedPlayers == joinedPlayers-1)
+                if (joinedPlayers > 1)
                 {
-                    int index = 0;
-
-                    foreach (GameObject player in _players)
+                    if (joinedPlayers - spawnedPlayers == joinedPlayers - 1)
                     {
-                        if (player.activeSelf)
-                        {
-                            index = player.GetComponent<CharMovement>().playerIndex + 1;
-                            winnerText.GetComponent<Text>().text = "Player " + index + " Wins!";
-                        }
-                    }
-                    //change UI
-                    worldCanvas.SetActive(false);
-                    gameOverCanvas.SetActive(true);
-                    menuCanvas.SetActive(false);
-                    uiCanvas.SetActive(false);
+                        int index = 0;
 
-                    m_state = GameStates.gameOver;
-               
+                        foreach (GameObject player in _players)
+                        {
+                            if (player.activeSelf)
+                            {
+                                index = player.GetComponent<CharMovement>().playerIndex + 1;
+                                winnerText.GetComponent<Text>().text = "Player " + index + " Wins!";
+                            }
+                        }
+                        //change UI
+                        worldCanvas.SetActive(false);
+                        gameOverCanvas.SetActive(true);
+                        menuCanvas.SetActive(false);
+                        uiCanvas.SetActive(false);
+
+                        m_state = GameStates.gameOver;
+
+                    }
                 }
                 break;
             case GameStates.paused:
