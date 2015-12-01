@@ -31,22 +31,26 @@ public class WorldGenerator : MonoBehaviour
     {
         Instance = this;
         InitialiseTextureUpdater();
+
         GameObject parent = new GameObject();
-        parent.name = "Nodes";
+        parent.name = "parent";
+
         for (int x = 0; x < mapWidth; x++)
         {
             for (int y = 0; y < mapHeight; y++)
             {
+                GameObject element = new GameObject();
+                element.name = x + " " + y;
+                element.transform.position = new Vector2(x, y);
+                GridElement gridElement = element.AddComponent<GridElement>();
+                element.transform.parent = parent.transform;
 
-                GameObject go = new GameObject();
-                go.AddComponent<BoxCollider2D>();
-                go.transform.position = new Vector3(x+0.5f, y+0.5f, 0f);
-                go.AddComponent<GridElement>();
-                go.transform.SetParent(parent.transform);
-                GridElement gridElement = go.GetComponent<GridElement>();
+                element.AddComponent<BoxCollider2D>();
+                element.GetComponent<BoxCollider2D>().offset = new Vector2(0.5f, 0.5f);
+
                 //gridElement.name = x + " - " + y;
 
-                gridElement.m_pos = new Vector2(x+0.5f, y+0.5f);
+                gridElement.m_pos = new Vector2(x, y);
                 gridElement.m_node = new Node();
                 gridElement.m_node.position = new Vector3(x, y, 0);
                 if(x == 0 || x == mapWidth-1)
@@ -91,16 +95,23 @@ public class WorldGenerator : MonoBehaviour
                 }
                 grid[x, y] = gridElement;
 
-                if (gridElement.m_node.state == NodeState.active)
-                {
+            }            
+        }
 
-                    DrawTexture(x * 32 , (mapHeight - y) * 32 , white);
+        for (int x = 0; x < mapWidth; x++)
+        {
+            for (int y = 0; y < mapHeight; y++)
+            {
+                if (grid[x, y].m_node.state == NodeState.active)
+                {
+                    DrawTexture(x * 32, (mapHeight - y-1) * 32, white);
                 }
                 else
                 {
-                    DrawTexture(x * 32 , (mapHeight - y) * 32 , blank);
+                    DrawTexture(x * 32, (mapHeight - y-1) * 32, blank);
                 }
-            }            
+            }
+            
         }
     }
 
