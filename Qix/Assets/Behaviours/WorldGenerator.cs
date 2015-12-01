@@ -217,7 +217,7 @@ public class WorldGenerator : MonoBehaviour
     {
         y += 1;
         DrawTexture(x * 32 , (mapHeight - y) * 32 , playerFills[player]);
-        //AudioManager.instance.PlaySingle(completeSound);        
+        AudioManager.instance.PlaySingle(completeSound);        
     }
     public void PaintBurnt(int x, int y)
     {

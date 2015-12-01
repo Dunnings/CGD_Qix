@@ -145,6 +145,7 @@ public class CharMovement : MonoBehaviour
             constructionPathCorners.Clear();
             GameManager.instance.spawnedPlayers--;
             gameObject.SetActive(false);
+            AudioManager.instance.PlaySingle(AudioManager.instance.explode);
             //decrement amount of spawned players
 
             return;
@@ -447,7 +448,7 @@ public class CharMovement : MonoBehaviour
                         fuse.SetActive(true);
                     }
                     fuse.transform.position = Vector3.Lerp(constructionPath[fusePathPosition].position, constructionPath[fusePathPosition + 1].position, Time.time - fuseTimeLastHitNewNode / fuseSpeed);
-                    //AudioManager.instance.RandomizeSfx(fuseSound, fuseSound);
+                    AudioManager.instance.RandomizeSfx(fuseSound, fuseSound);
                     if (Time.time - fuseTimeLastHitNewNode > fuseSpeed)
                     {
                         if (fusePathPosition + 2 >= constructionPath.Count)
@@ -723,9 +724,11 @@ public class CharMovement : MonoBehaviour
             calcFloodFill(x, y - 1, ref area, 2);
         }
     }
+    public GameObject TheQix;
+
     bool CanPathToQix(float x, float y)
     {
-        Vector2 QixPos = new Vector2(75, 37);
+        Vector2 QixPos = new Vector2(TheQix.transform.position.x, TheQix.transform.position.y);
         int count = 0;
         for (int i = 1; i < constructionPathCorners.Count; i++)
         {

@@ -2,7 +2,7 @@
 using System.Collections;
 
 public class AudioManager : MonoBehaviour {
-
+    public AudioClip explode;
     public AudioSource efxSource;
     public AudioSource musicSource;
     public static AudioManager instance = null;
