@@ -53,6 +53,7 @@ public class CharMovement : MonoBehaviour
 	public MoveInput lastInput;
 
     Node currentNode;
+    Node previousNode;
 
     public AudioClip fuseSound;
 
@@ -71,6 +72,7 @@ public class CharMovement : MonoBehaviour
         //If this node is not the current node
         if (inputNode != currentNode)
         {
+            previousNode = currentNode;
             //Current node is now this node
             currentNode = inputNode;
             //If current node state is inactive and we are constructing
@@ -84,13 +86,13 @@ public class CharMovement : MonoBehaviour
                 //Add this node to the construction path
                 constructionPath.Add(inputNode);
 
-				GameObject node = new GameObject();
-				node.transform.position = new Vector3(inputNode.position.x, inputNode.position.y, 0f);
-				node.tag = "Node";
+				//GameObject node = new GameObject();
+				//node.transform.position = new Vector3(inputNode.position.x, inputNode.position.y, 0f);
+				//node.tag = "Node";
 				
-				node.AddComponent<BoxCollider2D>();
-				node.GetComponent<BoxCollider2D>().offset = new Vector2(0.5f, 0.5f);
-				node.GetComponent<BoxCollider2D>().isTrigger = true;
+				//node.AddComponent<BoxCollider2D>();
+				//node.GetComponent<BoxCollider2D>().offset = new Vector2(0.5f, 0.5f);
+				//node.GetComponent<BoxCollider2D>().isTrigger = true;
 
 				//node.AddComponent<Node>();
 				//node.GetComponent<Node>().Equals(inputNode);
@@ -486,9 +488,19 @@ public class CharMovement : MonoBehaviour
 			case MoveInput.UP:
 				if (validUp || (constructing && !validUp))
 				{
+                        try {
+                            if (constructing && WorldGenerator.Instance.grid[(int)currentNode.position.x, (int)currentNode.position.y + 2].m_node.state == NodeState.construction)
+                            {
+                                break;
+                            }
+                        }
+                        catch (IndexOutOfRangeException ex)
+                        {
 
-					//if vertical movement then allow movement
-					transform.Translate(0, 1 * moveSpeed, 0);
+                        }
+
+                        //if vertical movement then allow movement
+                        transform.Translate(0, 1 * moveSpeed, 0);
 					validLeft = false;
 					validRight = false;
 					validDown = true;
@@ -506,9 +518,22 @@ public class CharMovement : MonoBehaviour
 				}
 				break;
 			case MoveInput.DOWN:
-				if (validDown || (constructing && !validDown))
+                
+
+                if (validDown || (constructing && !validDown))
 				{
-					transform.Translate(0, -1 * moveSpeed, 0);
+                        try
+                        {
+                            if (constructing && WorldGenerator.Instance.grid[(int)currentNode.position.x, (int)currentNode.position.y - 2].m_node.state == NodeState.construction)
+                            {
+                                break;
+                            }
+                        }
+                        catch (IndexOutOfRangeException ex)
+                        {
+
+                        }
+                        transform.Translate(0, -1 * moveSpeed, 0);
 					validLeft = false;
 					validRight = false;
 					validUp = true;
@@ -528,7 +553,18 @@ public class CharMovement : MonoBehaviour
 			case MoveInput.LEFT:
 				if (validLeft || (constructing && !validLeft))
 				{
-					transform.Translate(-1 * moveSpeed, 0, 0);
+                        try {
+                            if (constructing && WorldGenerator.Instance.grid[(int)currentNode.position.x - 2, (int)currentNode.position.y].m_node.state == NodeState.construction)
+                            {
+                                break;
+                            }
+                        }
+                        catch(IndexOutOfRangeException ex)
+                        {
+
+                        }
+
+                        transform.Translate(-1 * moveSpeed, 0, 0);
 					validUp = false;
 					validDown = false;
 					validRight = true;
@@ -548,7 +584,20 @@ public class CharMovement : MonoBehaviour
 			case MoveInput.RIGHT:
 				if (validRight || (constructing && !validRight))
 				{
-					transform.Translate(1 * moveSpeed, 0, 0);
+                        try {
+                            if (constructing && WorldGenerator.Instance.grid[(int)currentNode.position.x + 2, (int)currentNode.position.y].m_node.state == NodeState.construction)
+                            {
+                                Debug.Log((int)currentNode.position.x + 2 + "  _  " + (int)currentNode.position.y);
+                                break;
+                            }
+                        }
+                        catch (IndexOutOfRangeException ex)
+                        {
+
+                        }
+
+
+                        transform.Translate(1 * moveSpeed, 0, 0);
 					validUp = false;
 					validDown = false;
 					validLeft = true;
