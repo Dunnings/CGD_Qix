@@ -713,4 +713,22 @@ public class CharMovement : MonoBehaviour
         //set UI component 
         scoreUI.GetComponent<Text>().text = score + "%";
     }
+
+    bool intersection(float x1, float y1, float x2, float y2, float x3, float y3, float x4, float y4)
+    {
+        Debug.DrawLine(new Vector3(x1, y1, 0f), new Vector3(x2, y2, 0f), Color.blue, 60f);
+        Debug.DrawLine(new Vector3(x3, y3, 0f), new Vector3(x4, y4, 0f), Color.green, 60f);
+        float d = (x1 - x2) * (y3 - y4) - (y1 - y2) * (x3 - x4);
+        if (d == 0) return false;
+        float xi = ((x3 - x4) * (x1 * y2 - y1 * x2) - (x1 - x2) * (x3 * y4 - y3 * x4)) / d;
+        float yi = ((y3 - y4) * (x1 * y2 - y1 * x2) - (y1 - y2) * (x3 * y4 - y3 * x4)) / d;
+        if (x3 == x4)
+        {
+            if (yi < Mathf.Min(y1, y2) || yi > Mathf.Max(y1, y2)) return false;
+        }
+        Vector2 p = new Vector2(xi, yi);
+        if (xi < Mathf.Min(x1, x2) || xi > Mathf.Max(x1, x2)) return false;
+        if (xi < Mathf.Min(x3, x4) || xi > Mathf.Max(x3, x4)) return false;
+        return true;
+    }
 }
