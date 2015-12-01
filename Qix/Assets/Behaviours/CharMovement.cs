@@ -579,7 +579,6 @@ public class CharMovement : MonoBehaviour
         int count = 0;
         for (int i = 1; i < constructionPathCorners.Count; i++)
         {
-            WorldGenerator.Instance.PaintBurnt((int)constructionPathCorners[i].position.x, (int)constructionPathCorners[i].position.y);
             Debug.DrawLine(new Vector2(QixPos.x, QixPos.y), new Vector2(x, y), Color.blue, 60f);
             Debug.DrawLine(new Vector2(constructionPathCorners[i].position.x, constructionPathCorners[i].position.y), new Vector2(constructionPathCorners[i - 1].position.x, constructionPathCorners[i - 1].position.y), Color.blue, 60f);
             if (Intersect(new Point(QixPos.x, QixPos.y), new Point(x,y), new Point(constructionPathCorners[i].position.x, constructionPathCorners[i].position.y), new Point(constructionPathCorners[i-1].position.x, constructionPathCorners[i-1].position.y)))
