@@ -10,8 +10,8 @@ public class CharMovement : MonoBehaviour
     //Movement Speed
     public float moveSpeed = 1;
     //Construction Path
-    List<Node> constructionPath = new List<Node>();
-    List<Node> constructionPathCorners = new List<Node>();
+    public List<Node> constructionPath = new List<Node>();
+    public List<Node> constructionPathCorners = new List<Node>();
     //Can I move in a direction
     public bool validUp, validDown, validLeft, validRight;
     //Am I alive
@@ -140,7 +140,12 @@ public class CharMovement : MonoBehaviour
                 fusePathPosition = 0;
             }
 
+            constructionPath.Clear();
+            constructionPathCorners.Clear();
+            GameManager.instance.spawnedPlayers--;
             gameObject.SetActive(false);
+            //decrement amount of spawned players
+            
             return;
         }
 
@@ -441,7 +446,7 @@ public class CharMovement : MonoBehaviour
                         fuse.SetActive(true);
                     }
                     fuse.transform.position = Vector3.Lerp(constructionPath[fusePathPosition].position, constructionPath[fusePathPosition + 1].position, Time.time - fuseTimeLastHitNewNode / fuseSpeed);
-                    AudioManager.instance.RandomizeSfx(fuseSound, fuseSound);
+                    //AudioManager.instance.RandomizeSfx(fuseSound, fuseSound);
                     if (Time.time - fuseTimeLastHitNewNode > fuseSpeed)
                     {
                         if (fusePathPosition + 2 >= constructionPath.Count)

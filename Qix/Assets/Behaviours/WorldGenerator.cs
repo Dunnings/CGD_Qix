@@ -29,6 +29,74 @@ public class WorldGenerator : MonoBehaviour
 
     public AudioClip completeSound;
     
+    public void Reset()
+    {
+      
+       for (int x = 0; x < mapWidth; x++)
+        {
+            for (int y = 0; y < mapHeight; y++)
+            {
+                if (x == 0 || x == mapWidth - 1)
+                {
+                    grid[x,y].m_node.directions[0] = true;
+                    grid[x, y].m_node.directions[2] = true;
+                    grid[x, y].m_node.state = NodeState.active;
+                }
+                if (y == 0 || y == mapHeight - 1)
+                {
+                    grid[x, y].m_node.directions[1] = true;
+                    grid[x, y].m_node.directions[3] = true;
+                    grid[x, y].m_node.state = NodeState.active;
+                }
+                if (x == 0 && y == 0)
+                {
+                    grid[x, y].m_node.directions[0] = true;
+                    grid[x, y].m_node.directions[1] = true;
+                    grid[x, y].m_node.directions[2] = false;
+                    grid[x, y].m_node.directions[3] = false;
+                }
+                if (x == mapWidth - 1 && y == 0)
+                {
+                    grid[x, y].m_node.directions[0] = true;
+                    grid[x, y].m_node.directions[1] = false;
+                    grid[x, y].m_node.directions[2] = false;
+                    grid[x, y].m_node.directions[3] = true;
+                }
+                if (x == 0 && y == mapHeight - 1)
+                {
+                    grid[x, y].m_node.directions[0] = false;
+                    grid[x, y].m_node.directions[1] = true;
+                    grid[x, y].m_node.directions[2] = true;
+                    grid[x, y].m_node.directions[3] = false;
+                }
+                if (x == mapWidth - 1 && y == mapHeight - 1)
+                {
+                    grid[x, y].m_node.directions[0] = false;
+                    grid[x, y].m_node.directions[1] = false;
+                    grid[x, y].m_node.directions[2] = true;
+                    grid[x, y].m_node.directions[3] = true;
+                }
+                
+            }
+        }
+
+       for (int x = 0; x < mapWidth; x++)
+       {
+           for (int y = 0; y < mapHeight; y++)
+           {
+               if (grid[x, y].m_node.state == NodeState.active)
+               {
+                   DrawTexture(x * 32, (mapHeight - y - 1) * 32, white);
+               }
+               else
+               {
+                   DrawTexture(x * 32, (mapHeight - y - 1) * 32, blank);
+               }
+           }
+
+       }
+    }
+
 	void Awake ()
     {
         Instance = this;
@@ -96,7 +164,6 @@ public class WorldGenerator : MonoBehaviour
                     gridElement.m_node.directions[3] = true;
                 }
                 grid[x, y] = gridElement;
-
             }            
         }
 
@@ -150,7 +217,7 @@ public class WorldGenerator : MonoBehaviour
     {
         y += 1;
         DrawTexture(x * 32 , (mapHeight - y) * 32 , playerFills[player]);
-        AudioManager.instance.PlaySingle(completeSound);        
+        //AudioManager.instance.PlaySingle(completeSound);        
     }
     public void PaintBurnt(int x, int y)
     {
