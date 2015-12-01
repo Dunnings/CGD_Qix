@@ -1,10 +1,13 @@
 fileFormatVersion: 2
 guid: 684f07b3ce1a7a5449111b0c9d93593d
-timeCreated: 1448528434
-licenseType: Pro
+timeCreated: 1448975846
+licenseType: Free
 MonoImporter:
   serializedVersion: 2
-  defaultReferences: []
+  defaultReferences:
+  - scoreUI: {instanceID: 0}
+  - fuse: {instanceID: 0}
+  - fuseSound: {fileID: 8300000, guid: d692a71c962ab844aa4fe6293b7d006c, type: 3}
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 
