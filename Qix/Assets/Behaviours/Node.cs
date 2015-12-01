@@ -20,5 +20,6 @@ public class Node
     //2 = down
     //3 = left
     public bool[] directions = new bool[4];
+    public int owner = 0;
     public NodeState state = NodeState.inactive;
 }

@@ -78,6 +78,7 @@ public class CharMovement : MonoBehaviour
             {
                 //Set this node to constructing
                 inputNode.state = NodeState.construction;
+                inputNode.owner = playerIndex;
                 //Paint this node
                 WorldGenerator.Instance.PaintConstruction((int)inputNode.position.x, (int)inputNode.position.y, playerIndex);
                 //Add this node to the construction path
