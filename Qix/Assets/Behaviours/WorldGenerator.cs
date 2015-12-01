@@ -142,20 +142,18 @@ public class WorldGenerator : MonoBehaviour
     {
         y += 1;
         DrawTexture(x * 32 , (mapHeight - y) * 32 , playerFills[player]);
-        //AudioManager.instance.PlaySingle(completeSound);        
+        AudioManager.instance.PlaySingle(completeSound);        
     }
     public void PaintBurnt(int x, int y)
     {
         y += 1;
-        DrawTexture(x * 32 , (mapHeight - y) * 32 , burntTile);
-        //AudioManager.instance.PlaySingle(completeSound);        
+        DrawTexture(x * 32 , (mapHeight - y) * 32 , burntTile);        
     }
 
     public void PaintInactive(int x, int y)
     {
         y += 1;
-        DrawTexture(x * 32 , (mapHeight - y) * 32 , blank);
-        //AudioManager.instance.PlaySingle(completeSound);        
+        DrawTexture(x * 32 , (mapHeight - y) * 32 , blank);        
     }
 
     int totalTiles = 11250;

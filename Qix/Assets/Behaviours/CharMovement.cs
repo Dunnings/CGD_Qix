@@ -56,6 +56,7 @@ public class CharMovement : MonoBehaviour
     Node previousNode;
 
     public AudioClip fuseSound;
+    public AudioClip fuseExplo;
 
     void Start()
     {
@@ -439,7 +440,7 @@ public class CharMovement : MonoBehaviour
                         fuse.SetActive(true);
                     }
                     fuse.transform.position = Vector3.Lerp(constructionPath[fusePathPosition].position, constructionPath[fusePathPosition + 1].position, Time.time - fuseTimeLastHitNewNode / fuseSpeed);
-                    //AudioManager.instance.RandomizeSfx(fuseSound, fuseSound);
+                    AudioManager.instance.RandomizeSfx(fuseSound, fuseSound);
                     if (Time.time - fuseTimeLastHitNewNode > fuseSpeed)
                     {
                         if (fusePathPosition + 2 >= constructionPath.Count)

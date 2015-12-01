@@ -35,6 +35,7 @@ public class GameManager : MonoBehaviour
     public List<GameObject> _players = new List<GameObject>();
 
     public AudioClip music;
+    public AudioClip playerJoined;
 
     public double overAllFill = 0.0f;
     
@@ -77,6 +78,7 @@ public class GameManager : MonoBehaviour
             ////set up player and controller indexes
             _players[0].GetComponent<CharMovement>().playerIndex = 0;
             _players[0].GetComponent<CharMovement>().controllerIndex = 0;
+
         }
         worldCanvas.SetActive(true);
         menuCanvas.SetActive(true);
@@ -107,6 +109,7 @@ public class GameManager : MonoBehaviour
                         if (_players[i].GetComponent<CharMovement>().joined &&
                             playerUIElements[i].GetComponentInChildren<Image>().color != Color.white)
                         {
+                            AudioManager.instance.PlaySingle(playerJoined);
                             //get UI element color
                             Color get = playerUIElements[i].GetComponentInChildren<Image>().color;
                             //turn up alpha
@@ -134,7 +137,7 @@ public class GameManager : MonoBehaviour
                     m_state = GameStates.game;
 
                     //start music
-                    //AudioManager.instance.PlayMusic(music);
+                    AudioManager.instance.PlayMusic(music);
 
                     //loop over all possible players
                     for (int i = 0; i < _players.Count; i++)
