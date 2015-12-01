@@ -143,21 +143,25 @@ public class WorldGenerator : MonoBehaviour
     }
     public void PaintConstruction(int x, int y, int player)
     {
+        y += 1;
         DrawTexture(x * 32 , (mapHeight - y) * 32 , playerConstructionFills[player]);
     }
     public void PaintActive(int x, int y, int player)
     {
+        y += 1;
         DrawTexture(x * 32 , (mapHeight - y) * 32 , playerFills[player]);
         //AudioManager.instance.PlaySingle(completeSound);        
     }
     public void PaintBurnt(int x, int y)
     {
+        y += 1;
         DrawTexture(x * 32 , (mapHeight - y) * 32 , burntTile);
         //AudioManager.instance.PlaySingle(completeSound);        
     }
 
     public void PaintInactive(int x, int y)
     {
+        y += 1;
         DrawTexture(x * 32 , (mapHeight - y) * 32 , blank);
         //AudioManager.instance.PlaySingle(completeSound);        
     }
