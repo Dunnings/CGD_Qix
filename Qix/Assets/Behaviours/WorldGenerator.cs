@@ -17,6 +17,8 @@ public class WorldGenerator : MonoBehaviour
     public GameObject renderObject;
     public Texture2D blank;
     public Texture2D white;
+    public List<Texture2D> playerFills;
+    public List<Texture2D> playerConstructionFills;
     public Texture2D construction;
     public Texture2D burntTile;
     public GridElement[,] grid = new GridElement[150,75];
@@ -128,13 +130,13 @@ public class WorldGenerator : MonoBehaviour
         GL.PopMatrix();
         Graphics.SetRenderTarget(null);
     }
-    public void PaintConstruction(int x, int y)
+    public void PaintConstruction(int x, int y, int player)
     {
-        DrawTexture(x * 32 , (mapHeight - y) * 32 , construction);
+        DrawTexture(x * 32 , (mapHeight - y) * 32 , playerConstructionFills[player]);
     }
-    public void PaintActive(int x, int y)
+    public void PaintActive(int x, int y, int player)
     {
-        DrawTexture(x * 32 , (mapHeight - y) * 32 , white);
+        DrawTexture(x * 32 , (mapHeight - y) * 32 , playerFills[player]);
         //AudioManager.instance.PlaySingle(completeSound);        
     }
     public void PaintBurnt(int x, int y)
@@ -150,144 +152,5 @@ public class WorldGenerator : MonoBehaviour
     }
 
     int totalTiles = 11250;
-
-    public IEnumerator PaintFill(int x1, int y1, int x2, int y2)
-    {
-        yield return null;
-        int count1 = UnsafeFloodFill3(x1, y1);
-        if (count1 < totalTiles)
-        {
-            
-            totalTiles -= UnsafeFloodFill3(x1, y1, true);
-        }
-        else
-        {
-            totalTiles -= UnsafeFloodFill3(x2, y2, true);
-        }
-    }
-
-    int UnsafeFloodFill3(int x, int y, bool colour = false)
-    {
-        int returnAmount = 0;
-
-        List<int> checkedValues = new List<int>();
-
-        List<int> ptsx = new List<int>();
-        ptsx.Add(x);
-        List<int> ptsy = new List<int>();
-        ptsy.Add(y);
-
-        while (ptsx.Count > 0)
-        {
-            // check if x-1 is in bounds
-            if (ptsx[0] - 1 > 0)
-            {
-                if (!checkedValues.Contains((ptsx[0] - 1 + ptsy[0]) * ptsy[0])){
-                    //if grid element to the left is inactive
-                    if (grid[ptsx[0] - 1, ptsy[0]].m_node.state == NodeState.inactive)
-                    {
-                        // add this element to the array
-                        ptsx.Add(ptsx[0] - 1); ptsy.Add(ptsy[0]);
-                        if (colour)
-                        {
-                            grid[ptsx[0] - 1, ptsy[0]].m_node.state = NodeState.active;
-                            PaintActive(ptsx[0] - 1, ptsy[0]);
-                        }
-                        checkedValues.Add((ptsx[0] - 1 + ptsy[0]) * ptsy[0]);
-                        returnAmount++;
-                    }
-                }
-            }
-            if (ptsy[0] - 1 >= 0) {
-                if (!checkedValues.Contains((ptsx[0] + ptsy[0] - 1) * (ptsy[0] - 1))){
-                    if (grid[ptsx[0], ptsy[0] - 1].m_node.state == NodeState.inactive)
-                    {
-                        ptsx.Add(ptsx[0]); ptsy.Add(ptsy[0] - 1);
-                        if (colour)
-                        {
-                            grid[ptsx[0], ptsy[0] - 1].m_node.state = NodeState.active;
-                            PaintActive(ptsx[0], ptsy[0] - 1);
-                        }
-                        checkedValues.Add((ptsx[0] + ptsy[0] - 1) * (ptsy[0] - 1));
-                        returnAmount++;
-                    }
-                }
-            }
-            if (ptsx[0] + 1 <= mapWidth)
-            {
-                if (!checkedValues.Contains((ptsx[0] + 1 + ptsy[0]) * (ptsy[0])))
-                {
-                    if (grid[ptsx[0] + 1, ptsy[0]].m_node.state == NodeState.inactive)
-                    {
-                        ptsx.Add(ptsx[0] + 1); ptsy.Add(ptsy[0]);
-                        if (colour)
-                        {
-                            grid[ptsx[0] + 1, ptsy[0]].m_node.state = NodeState.active;
-                            PaintActive(ptsx[0] + 1, ptsy[0]);
-                        }
-                        checkedValues.Add((ptsx[0] + 1 + ptsy[0]) * (ptsy[0]));
-                        returnAmount++;
-                    }
-                }
-            }
-            if (ptsy[0] + 1 <= mapHeight)
-            {
-                if (!checkedValues.Contains((ptsx[0] + ptsy[0] + 1) * (ptsy[0] + 1)))
-                {
-                    if (grid[ptsx[0], ptsy[0] + 1].m_node.state == NodeState.inactive)
-                    {
-                        ptsx.Add(ptsx[0]); ptsy.Add(ptsy[0] + 1);
-                        if (colour)
-                        {
-                            grid[ptsx[0], ptsy[0] + 1].m_node.state = NodeState.active;
-                            PaintActive(ptsx[0], ptsy[0] + 1);
-                        }
-                        checkedValues.Add((ptsx[0] + ptsy[0] + 1) * (ptsy[0] + 1));
-                        returnAmount++;
-                    }
-                }
-            }
-            ptsx.RemoveAt(0);
-            ptsy.RemoveAt(0);
-        }
-
-        return returnAmount;
-    }
-
-    //public int PaintAllInactiveNeighbours(int x, int y, bool paint = true, int direction = 0)
-    //{
-    //    int result = 0;
-    //    //Direction 1 = up, 2 = right, 3 = down, 4 = left
-    //    if (direction != 4)
-    //    {
-    //        result += PaintAllInactiveNeighbours(x - 1, y, paint, 2);
-    //    }
-    //    if (direction != 2)
-    //    {
-    //        result += PaintAllInactiveNeighbours(x + 1, y, paint, 4);
-    //    }
-    //    if (direction != 3)
-    //    {
-    //        result += PaintAllInactiveNeighbours(x, y - 1, paint, 1);
-    //    }
-    //    if (direction != 1)
-    //    {
-    //        result += PaintAllInactiveNeighbours(x, y + 1, paint, 3);
-    //    }
-
-    //    if (x < mapWidth && x >= 0 && y < mapHeight && y >= 0)
-    //    {
-    //        if (grid[x, y].m_node.state == NodeState.active)
-    //        {
-    //            if (paint)
-    //            {
-    //                PaintActive(x, y);
-    //            }
-    //            grid[x, y].m_node.state = NodeState.active;
-    //            result++;
-    //        }
-    //    }
-    //    Debug.Log(result);
-    //    return result;
-    //}
+    
 }

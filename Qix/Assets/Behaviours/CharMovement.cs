@@ -79,7 +79,7 @@ public class CharMovement : MonoBehaviour
                 //Set this node to constructing
                 inputNode.state = NodeState.construction;
                 //Paint this node
-                WorldGenerator.Instance.PaintConstruction((int)inputNode.position.x, (int)inputNode.position.y);
+                WorldGenerator.Instance.PaintConstruction((int)inputNode.position.x, (int)inputNode.position.y, playerIndex);
                 //Add this node to the construction path
                 constructionPath.Add(inputNode);
 
@@ -188,8 +188,10 @@ public class CharMovement : MonoBehaviour
                                 constructionPath[i - 1].directions[0] = true;
                             }
                         }
-
-                        WorldGenerator.Instance.PaintActive((int)constructionPath[i].position.x, (int)constructionPath[i].position.y);
+                        if (i != 0 && i != constructionPath.Count - 1)
+                        {
+                            WorldGenerator.Instance.PaintActive((int)constructionPath[i].position.x, (int)constructionPath[i].position.y, playerIndex);
+                        }
 
                     }
 
@@ -604,7 +606,7 @@ public class CharMovement : MonoBehaviour
                 
         WorldGenerator.Instance.grid[x, y].m_node.state = NodeState.active;
 
-        WorldGenerator.Instance.PaintActive(x, y);
+        WorldGenerator.Instance.PaintActive(x, y, playerIndex);
         area++;
 
         FloodFill(x + 1, y, ref area);  
