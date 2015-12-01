@@ -20,9 +20,9 @@ public class CharMovement : MonoBehaviour
     //Am I constructing a path
     public bool constructing = false;
     //Controller indexes
-	public int playerIndex = 0, controllerIndex = 0;
+    public int playerIndex = 0, controllerIndex = 0;
     //States of gamepad
-	GamePadState state, prevState;
+    GamePadState state, prevState;
     //Controller axes
     public List<KeyValuePair<int, int>> axis = new List<KeyValuePair<int, int>>();
     public List<Node> CheckedNodes = new List<Node>();
@@ -39,18 +39,18 @@ public class CharMovement : MonoBehaviour
     private float fuseTimeLastHitNewNode = 0f;
 
     public double score = 0.0f;
-	
-	//Input enum
-	public enum MoveInput {UP, DOWN, LEFT, RIGHT, NULL};
-	//input stack contains the input(s) currently being held down
-	//it works as a stack and updates once an input toggles (from held to released etc)
-	List<MoveInput> inputStack = new List<MoveInput>();
 
-	public enum GridLoc {UP, DOWN, LEFT, RIGHT, MID};
+    //Input enum
+    public enum MoveInput { UP, DOWN, LEFT, RIGHT, NULL };
+    //input stack contains the input(s) currently being held down
+    //it works as a stack and updates once an input toggles (from held to released etc)
+    List<MoveInput> inputStack = new List<MoveInput>();
 
-	public List<GridLoc> location = new List<GridLoc>();
-    
-	public MoveInput lastInput;
+    public enum GridLoc { UP, DOWN, LEFT, RIGHT, MID };
+
+    public List<GridLoc> location = new List<GridLoc>();
+
+    public MoveInput lastInput;
 
     Node currentNode;
     Node previousNode;
@@ -65,7 +65,7 @@ public class CharMovement : MonoBehaviour
 
         fuse.SetActive(false);
 
-		SetLocation ();
+        SetLocation();
     }
 
     void HitNode(Node inputNode)
@@ -87,19 +87,19 @@ public class CharMovement : MonoBehaviour
                 //Add this node to the construction path
                 constructionPath.Add(inputNode);
 
-				//GameObject node = new GameObject();
-				//node.transform.position = new Vector3(inputNode.position.x, inputNode.position.y, 0f);
-				//node.tag = "Node";
-				
-				//node.AddComponent<BoxCollider2D>();
-				//node.GetComponent<BoxCollider2D>().offset = new Vector2(0.5f, 0.5f);
-				//node.GetComponent<BoxCollider2D>().isTrigger = true;
+                //GameObject node = new GameObject();
+                //node.transform.position = new Vector3(inputNode.position.x, inputNode.position.y, 0f);
+                //node.tag = "Node";
 
-				//node.AddComponent<Node>();
-				//node.GetComponent<Node>().Equals(inputNode);
+                //node.AddComponent<BoxCollider2D>();
+                //node.GetComponent<BoxCollider2D>().offset = new Vector2(0.5f, 0.5f);
+                //node.GetComponent<BoxCollider2D>().isTrigger = true;
+
+                //node.AddComponent<Node>();
+                //node.GetComponent<Node>().Equals(inputNode);
 
 
-				//
+                //
             }
             else
             {
@@ -123,13 +123,14 @@ public class CharMovement : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if(!alive)
+        if (!alive)
         {
-            if(constructionPath.Count > 0)
+            if (constructionPath.Count > 0)
             {
                 for (int i = 0; i < constructionPath.Count; i++)
                 {
-                    if(constructionPath[i].state == NodeState.construction) {
+                    if (constructionPath[i].state == NodeState.construction)
+                    {
 
                         constructionPath[i].state = NodeState.inactive;
                         WorldGenerator.Instance.PaintInactive((int)constructionPath[i].position.x, (int)constructionPath[i].position.y);
@@ -145,7 +146,7 @@ public class CharMovement : MonoBehaviour
             GameManager.instance.spawnedPlayers--;
             gameObject.SetActive(false);
             //decrement amount of spawned players
-            
+
             return;
         }
 
@@ -188,12 +189,12 @@ public class CharMovement : MonoBehaviour
                     for (int i = 0; i < constructionPath.Count; i++)
                     {
                         //perform flood fill
-                        
+
                         constructionPath[i].state = NodeState.active;
 
                         if (i > 0)
                         {
-                            
+
                             if (constructionPath[i - 1].position.x > constructionPath[i].position.x)
                             {
                                 //Moved left
@@ -237,7 +238,7 @@ public class CharMovement : MonoBehaviour
                         Vector3 prevDirection = (constructionPath[i - 2].position - constructionPath[i - 1].position).normalized;
                         if (prevDirection != direction)
                         {
-                            constructionPathCorners.Add(constructionPath[i-1]);
+                            constructionPathCorners.Add(constructionPath[i - 1]);
                         }
                     }
                     constructionPathCorners.Add(constructionPath[constructionPath.Count - 1]);
@@ -293,7 +294,7 @@ public class CharMovement : MonoBehaviour
                         //    //else flood fill to the right
                         //    FloodFill((int)constructionPath[1].position.x + 1, (int)constructionPath[1].position.y);
                         //}
-                        if(CanPathToQix(constructionPath[1].position.x + 1, constructionPath[1].position.y))
+                        if (CanPathToQix(constructionPath[1].position.x + 1, constructionPath[1].position.y))
                         {
                             FloodFill((int)constructionPath[1].position.x + 1, (int)constructionPath[1].position.y, ref area);
                             UpdateScore(area);
@@ -339,7 +340,7 @@ public class CharMovement : MonoBehaviour
                             UpdateScore(area);
                         }
                     }
-					
+
                     //clear the path 
                     constructionPath.Clear();
                     constructionPathCorners.Clear();
@@ -352,61 +353,61 @@ public class CharMovement : MonoBehaviour
                 {
                     lastMoveTime = Time.time;
                     if (!inputStack.Contains(MoveInput.UP))
-				    {
-                		//add to stack
-                		inputStack.Add(MoveInput.UP);
-					}
+                    {
+                        //add to stack
+                        inputStack.Add(MoveInput.UP);
+                    }
                 }
-				else //if no longer being held, remove from the list
-				{
-					inputStack.Remove(MoveInput.UP);
-				}
+                else //if no longer being held, remove from the list
+                {
+                    inputStack.Remove(MoveInput.UP);
+                }
 
-		
+
                 if (InputManager.DownHeld(playerIndex, prevState, state))
                 {
                     lastMoveTime = Time.time;
                     if (!inputStack.Contains(MoveInput.DOWN))
-					{
-						//add to stack
-						inputStack.Add(MoveInput.DOWN);
-					}
-				}
-				else //if no longer being held, remove from the list
-				{
-					inputStack.Remove(MoveInput.DOWN);
-				}
-		
+                    {
+                        //add to stack
+                        inputStack.Add(MoveInput.DOWN);
+                    }
+                }
+                else //if no longer being held, remove from the list
+                {
+                    inputStack.Remove(MoveInput.DOWN);
+                }
+
                 if (InputManager.LeftHeld(playerIndex, prevState, state))
                 {
                     lastMoveTime = Time.time;
                     if (!inputStack.Contains(MoveInput.LEFT))
-					{
-						//add to stack
-						inputStack.Add(MoveInput.LEFT);
-					}
+                    {
+                        //add to stack
+                        inputStack.Add(MoveInput.LEFT);
+                    }
                 }
-				else //if no longer being held, remove from the list
-				{
-					inputStack.Remove(MoveInput.LEFT);
-				}
+                else //if no longer being held, remove from the list
+                {
+                    inputStack.Remove(MoveInput.LEFT);
+                }
 
                 if (InputManager.RightHeld(playerIndex, prevState, state))
                 {
                     lastMoveTime = Time.time;
-					if (!inputStack.Contains(MoveInput.RIGHT))
-					{
-					//add to stack
-					inputStack.Add(MoveInput.RIGHT);         
-					}
+                    if (!inputStack.Contains(MoveInput.RIGHT))
+                    {
+                        //add to stack
+                        inputStack.Add(MoveInput.RIGHT);
+                    }
                 }
-				else //if no longer being held, remove from the list
-				{
-					inputStack.Remove(MoveInput.RIGHT);
-				}
+                else //if no longer being held, remove from the list
+                {
+                    inputStack.Remove(MoveInput.RIGHT);
+                }
 
-				//apply the stack in order & only if valid
-				ApplyMoveInput ();
+                //apply the stack in order & only if valid
+                ApplyMoveInput();
 
                 if (constructing && constructionPath.Count == 0)
                 {
@@ -477,63 +478,68 @@ public class CharMovement : MonoBehaviour
                 #endregion
         }
 
-        
+
     }
 
-	//loop through the list of inputs until a valid one is found
-	//when the first valid movement is found, it is applied and then will not apply another movement
-	void ApplyMoveInput ()
-	{
-		SetLocation ();
+    //loop through the list of inputs until a valid one is found
+    //when the first valid movement is found, it is applied and then will not apply another movement
+    void ApplyMoveInput()
+    {
+        SetLocation();
 
-		for (int i = 0; i < inputStack.Count; i++)
-		{
-			bool breakIt = false;
+        for (int i = 0; i < inputStack.Count; i++)
+        {
+            bool breakIt = false;
 
-			switch (inputStack[i])
-			{
-			case MoveInput.UP:
-				if (validUp || (constructing && !validUp))
-				{
-                    try {
-                        if (constructing && WorldGenerator.Instance.grid[(int)currentNode.position.x, (int)currentNode.position.y + 2].m_node.state == NodeState.construction)
+            switch (inputStack[i])
+            {
+                case MoveInput.UP:
+                    if (validUp || (constructing && !validUp))
+                    {
+                        try
+                        {
+                            if (constructing && WorldGenerator.Instance.grid[(int)currentNode.position.x, (int)currentNode.position.y + 2].m_node.state == NodeState.construction)
+                            {
+                                break;
+                            }
+                        }
+                        catch (IndexOutOfRangeException ex)
+                        {
+
+                        }
+
+                        if (constructing && constructionPath.Count <= 1 && validUp)
                         {
                             break;
                         }
+
+                        //if vertical movement then allow movement
+                        if (transform.position.y <= 73 - moveSpeed)
+                        {
+                            transform.Translate(0, 1 * moveSpeed, 0);
+                        }
+
+                        validLeft = false;
+                        validRight = false;
+                        validDown = true;
+                        validUp = true;
+
+                        if (constructing)
+                        {
+                            validLeft = true;
+                            validRight = true;
+                            validDown = false;
+                            //AmmendValidInputs ();
+                        }
+
+                        breakIt = true;
                     }
-                    catch (IndexOutOfRangeException ex)
+                    break;
+                case MoveInput.DOWN:
+
+
+                    if (validDown || (constructing && !validDown))
                     {
-
-                    }
-
-                    if(constructing && constructionPath.Count <= 1 && validUp)
-                    {
-                            break;
-                    }
-
-                    //if vertical movement then allow movement
-                    transform.Translate(0, 1 * moveSpeed, 0);
-					validLeft = false;
-					validRight = false;
-					validDown = true;
-					validUp = true;
-
-					if (constructing)
-					{
-						validLeft = true;
-						validRight = true;
-						validDown = false;
-						//AmmendValidInputs ();
-					}
-
-					breakIt = true;
-				}
-				break;
-			case MoveInput.DOWN:
-                
-
-                if (validDown || (constructing && !validDown))
-				{
                         try
                         {
                             if (constructing && WorldGenerator.Instance.grid[(int)currentNode.position.x, (int)currentNode.position.y - 2].m_node.state == NodeState.construction)
@@ -549,33 +555,39 @@ public class CharMovement : MonoBehaviour
                         {
                             break;
                         }
-                        transform.Translate(0, -1 * moveSpeed, 0);
-					validLeft = false;
-					validRight = false;
-					validUp = true;
-					validDown = true;
 
-					if (constructing)
-					{
-						validLeft = true;
-						validRight = true;
-						validUp = false;
-						//AmmendValidInputs ();
-					}
-					
-					breakIt = true;
-				}
-				break;
-			case MoveInput.LEFT:
-				if (validLeft || (constructing && !validLeft))
-				{
-                        try {
+                        if (transform.position.y >= 1 * moveSpeed)
+                        {
+                            transform.Translate(0, -1 * moveSpeed, 0);
+                        }
+
+                        validLeft = false;
+                        validRight = false;
+                        validUp = true;
+                        validDown = true;
+
+                        if (constructing)
+                        {
+                            validLeft = true;
+                            validRight = true;
+                            validUp = false;
+                            //AmmendValidInputs ();
+                        }
+
+                        breakIt = true;
+                    }
+                    break;
+                case MoveInput.LEFT:
+                    if (validLeft || (constructing && !validLeft))
+                    {
+                        try
+                        {
                             if (constructing && WorldGenerator.Instance.grid[(int)currentNode.position.x - 2, (int)currentNode.position.y].m_node.state == NodeState.construction)
                             {
                                 break;
                             }
                         }
-                        catch(IndexOutOfRangeException ex)
+                        catch (IndexOutOfRangeException ex)
                         {
 
                         }
@@ -584,27 +596,32 @@ public class CharMovement : MonoBehaviour
                         {
                             break;
                         }
-                        transform.Translate(-1 * moveSpeed, 0, 0);
-					validUp = false;
-					validDown = false;
-					validRight = true;
-					validLeft = true;
+                        //Check we're within bounds
+                        if (transform.position.x >= 1 * moveSpeed)
+                        {
+                            transform.Translate(-1 * moveSpeed, 0, 0);
+                        }
+                        validUp = false;
+                        validDown = false;
+                        validRight = true;
+                        validLeft = true;
 
-					if (constructing)
-					{
-						validUp = true;
-						validRight = false;
-						validDown = true;
-						//AmmendValidInputs ();
-					}
-					
-					breakIt = true;
-				}
-				break;
-			case MoveInput.RIGHT:
-				if (validRight || (constructing && !validRight))
-				{
-                        try {
+                        if (constructing)
+                        {
+                            validUp = true;
+                            validRight = false;
+                            validDown = true;
+                            //AmmendValidInputs ();
+                        }
+
+                        breakIt = true;
+                    }
+                    break;
+                case MoveInput.RIGHT:
+                    if (validRight || (constructing && !validRight))
+                    {
+                        try
+                        {
                             if (constructing && WorldGenerator.Instance.grid[(int)currentNode.position.x + 2, (int)currentNode.position.y].m_node.state == NodeState.construction)
                             {
                                 Debug.Log((int)currentNode.position.x + 2 + "  _  " + (int)currentNode.position.y);
@@ -620,38 +637,42 @@ public class CharMovement : MonoBehaviour
                             break;
                         }
 
+                        //Check we're within bounds
 
-                        transform.Translate(1 * moveSpeed, 0, 0);
-					validUp = false;
-					validDown = false;
-					validLeft = true;
-					validRight = true;
+                        if (transform.position.x < 149f - (1*moveSpeed))
+                        {
+                            transform.Translate(1 * moveSpeed, 0, 0);
+                        }
+                        validUp = false;
+                        validDown = false;
+                        validLeft = true;
+                        validRight = true;
 
-					if (constructing)
-					{
-						validLeft = false;
-						validUp = true;
-						validDown = true;
-						//AmmendValidInputs ();
-					}
-					
-					breakIt = true;
-				}    
-				break;
-			}
+                        if (constructing)
+                        {
+                            validLeft = false;
+                            validUp = true;
+                            validDown = true;
+                            //AmmendValidInputs ();
+                        }
 
-			if (breakIt)
-			{
-				break;
-			}
-		}
-	}
+                        breakIt = true;
+                    }
+                    break;
+            }
 
-	void AmmendValidInputs ()
-	{
-		//Ammend validity statements so that the player can leave the grid
-		//if (location.Contains (GridLoc.UP) && drawing) 
-	}
+            if (breakIt)
+            {
+                break;
+            }
+        }
+    }
+
+    void AmmendValidInputs()
+    {
+        //Ammend validity statements so that the player can leave the grid
+        //if (location.Contains (GridLoc.UP) && drawing) 
+    }
 
     /// <summary>
     /// flood fill algorithm called after lines are completed
@@ -661,20 +682,20 @@ public class CharMovement : MonoBehaviour
     /// <param name="i"></param>
     void calcFloodFill(int x, int y, ref int area, int direction)
     {
-        if(x < 1 || x > 148 || y < 1 || y > 74)
+        if (x < 1 || x > 148 || y < 1 || y > 74)
         {
             return;
         }
         if ((WorldGenerator.Instance.grid[x, y].m_node.state == NodeState.active))
         {
-            return;            
+            return;
         }
 
         if (CheckedNodes.Contains(WorldGenerator.Instance.grid[x, y].m_node))
         {
             return;
         }
-        
+
         //axis.Add(new KeyValuePair<int, int>(x, y));
         //WorldGenerator.Instance.PaintActive(x,y);
         area++;
@@ -710,12 +731,12 @@ public class CharMovement : MonoBehaviour
         {
             Debug.DrawLine(new Vector2(QixPos.x, QixPos.y), new Vector2(x, y), Color.blue, 60f);
             Debug.DrawLine(new Vector2(constructionPathCorners[i].position.x, constructionPathCorners[i].position.y), new Vector2(constructionPathCorners[i - 1].position.x, constructionPathCorners[i - 1].position.y), Color.blue, 60f);
-            if (Intersect(new Point(QixPos.x, QixPos.y), new Point(x,y), new Point(constructionPathCorners[i].position.x, constructionPathCorners[i].position.y), new Point(constructionPathCorners[i-1].position.x, constructionPathCorners[i-1].position.y)))
+            if (Intersect(new Point(QixPos.x, QixPos.y), new Point(x, y), new Point(constructionPathCorners[i].position.x, constructionPathCorners[i].position.y), new Point(constructionPathCorners[i - 1].position.x, constructionPathCorners[i - 1].position.y)))
             {
                 count++;
             }
         }
-        Debug.Log("Intersections: "+ count);
+        Debug.Log("Intersections: " + count);
         return count % 2 != 0;
     }
 
@@ -729,16 +750,16 @@ public class CharMovement : MonoBehaviour
         {
             return;
         }
-                
+
         WorldGenerator.Instance.grid[x, y].m_node.state = NodeState.active;
 
         WorldGenerator.Instance.PaintActive(x, y, playerIndex);
         area++;
 
-        FloodFill(x + 1, y, ref area);  
+        FloodFill(x + 1, y, ref area);
         FloodFill(x - 1, y, ref area);
         FloodFill(x, y + 1, ref area);
-        FloodFill(x, y - 1, ref area);   
+        FloodFill(x, y - 1, ref area);
     }
 
     //finds where the character is in the grid and then adds
