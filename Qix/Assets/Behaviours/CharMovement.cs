@@ -192,6 +192,7 @@ public class CharMovement : MonoBehaviour
                         WorldGenerator.Instance.PaintActive((int)constructionPath[i].position.x, (int)constructionPath[i].position.y);
 
                     }
+
                     //CORNER GENERATION
                     constructionPathCorners.Add(constructionPath[0]);
                     for (int i = 2; i < constructionPath.Count; i++)
