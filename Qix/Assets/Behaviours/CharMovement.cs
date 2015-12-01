@@ -144,6 +144,7 @@ public class CharMovement : MonoBehaviour
             constructionPathCorners.Clear();
             GameManager.instance.spawnedPlayers--;
             gameObject.SetActive(false);
+            AudioManager.instance.PlaySingle(AudioManager.instance.explode);
             //decrement amount of spawned players
             
             return;
