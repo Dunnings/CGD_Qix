@@ -5,6 +5,7 @@ using System.Collections.Generic;
 
 public class SparkMovement : MonoBehaviour
 {
+    public bool clockwise;
     public float moveSpeed = 0.1f;
     // Use this for initialization
     public bool validUp, validDown, validLeft, validRight, alive = false;
@@ -51,10 +52,20 @@ public class SparkMovement : MonoBehaviour
             case GameStates.game:
                 #region da game bit
 
+                if (clockwise)
+                {
                     inputStack.Add(MoveInput.UP);
                     inputStack.Add(MoveInput.RIGHT);
                     inputStack.Add(MoveInput.DOWN);
                     inputStack.Add(MoveInput.LEFT);
+                }
+                else
+                {
+                    inputStack.Add(MoveInput.LEFT);
+                    inputStack.Add(MoveInput.DOWN);
+                    inputStack.Add(MoveInput.RIGHT);
+                    inputStack.Add(MoveInput.UP);
+                }
 
                 //apply the stack in order & only if valid
                 ApplyMoveInput();
