@@ -121,12 +121,12 @@ public class QixBehaviour : MonoBehaviour
 		tempX = (int) transform.position.x;
 		if ((transform.position.x - tempX) > 0.5f)
 		{
-			tempX++;
+			//tempX++;
 		}
 		tempY = (int) transform.position.y;
 		if ((transform.position.y - tempY) > 0.5f)
 		{
-			tempY++;
+			//tempY++;
 		}
 
 		transform.position = new Vector3 (tempX, tempY, 0f);
