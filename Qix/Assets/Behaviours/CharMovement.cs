@@ -702,9 +702,11 @@ public class CharMovement : MonoBehaviour
             calcFloodFill(x, y - 1, ref area, 2);
         }
     }
+    public GameObject TheQix;
+
     bool CanPathToQix(float x, float y)
     {
-        Vector2 QixPos = new Vector2(75, 37);
+        Vector2 QixPos = new Vector2(TheQix.transform.position.x, TheQix.transform.position.y);
         int count = 0;
         for (int i = 1; i < constructionPathCorners.Count; i++)
         {
