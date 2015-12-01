@@ -78,6 +78,7 @@ public class CharMovement : MonoBehaviour
             {
                 //Set this node to constructing
                 inputNode.state = NodeState.construction;
+                inputNode.owner = playerIndex;
                 //Paint this node
                 WorldGenerator.Instance.PaintConstruction((int)inputNode.position.x, (int)inputNode.position.y, playerIndex);
                 //Add this node to the construction path
@@ -217,6 +218,36 @@ public class CharMovement : MonoBehaviour
                         }
                     }
                     constructionPathCorners.Add(constructionPath[constructionPath.Count - 1]);
+                    //Find direction
+                    var a = constructionPathCorners[0];
+                    var b = constructionPathCorners[constructionPathCorners.Count - 1];
+                    Vector3 dir = (a.position - b.position).normalized;
+
+                    Vector3 up = new Vector3(0f, 1f, 0f);
+                    Vector3 down = new Vector3(0f, -1f, 0f);
+                    Vector3 left = new Vector3(1f, 0f, 0f);
+                    Vector3 right = new Vector3(-1f, 0f, 0f);
+
+                    if (dir == up)
+                    {
+                        constructionPathCorners[0].directions[2] = false;
+                        constructionPathCorners[constructionPathCorners.Count - 1].directions[0] = false;
+                    }
+                    if (dir == down)
+                    {
+                        constructionPathCorners[0].directions[0] = false;
+                        constructionPathCorners[constructionPathCorners.Count - 1].directions[2] = false;
+                    }
+                    if (dir == left)
+                    {
+                        constructionPathCorners[0].directions[3] = false;
+                        constructionPathCorners[constructionPathCorners.Count - 1].directions[1] = false;
+                    }
+                    if (dir == right)
+                    {
+                        constructionPathCorners[0].directions[1] = false;
+                        constructionPathCorners[constructionPathCorners.Count - 1].directions[3] = false;
+                    }
 
                     //Going up or down
                     if ((int)constructionPath[1].position.y > (int)constructionPath[0].position.y ||
