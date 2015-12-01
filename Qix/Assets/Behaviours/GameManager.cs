@@ -18,10 +18,14 @@ public class GameManager : MonoBehaviour
     public GameObject menuCanvas;
     public GameObject worldCanvas;
     public GameObject uiCanvas;
+    public GameObject gameOverCanvas; 
+
     public List<GameObject> playerUIElements;
     public List<GameObject> playerIconUIElements;
+
     public GameObject menuCreditText;
     public GameObject gameCreditText;
+    public GameObject winnerText;
 
     private string creditsString = "CREDITS";
     private int creditsInt = 64;
@@ -31,6 +35,8 @@ public class GameManager : MonoBehaviour
     public List<GameObject> _players = new List<GameObject>();
 
     public AudioClip music;
+
+    public double overAllFill = 0.0f;
     
 	void Awake()
     {
@@ -75,6 +81,7 @@ public class GameManager : MonoBehaviour
         worldCanvas.SetActive(true);
         menuCanvas.SetActive(true);
         uiCanvas.SetActive(false);
+        gameOverCanvas.SetActive(false);
         //set state to menu
         m_state = GameStates.menu;
 	}
@@ -100,7 +107,7 @@ public class GameManager : MonoBehaviour
                         if (_players[i].GetComponent<CharMovement>().joined &&
                             playerUIElements[i].GetComponentInChildren<Image>().color != Color.white)
                         {
-                            //get UI element colour
+                            //get UI element color
                             Color get = playerUIElements[i].GetComponentInChildren<Image>().color;
                             //turn up alpha
                             get.a = 1.0f;
@@ -120,6 +127,7 @@ public class GameManager : MonoBehaviour
                     && creditsInt< 64)
                 {
                     worldCanvas.SetActive(true);
+                    gameOverCanvas.SetActive(false);
                     menuCanvas.SetActive(false);
                     uiCanvas.SetActive(true);
                     //set game state
@@ -131,23 +139,78 @@ public class GameManager : MonoBehaviour
                     //loop over all possible players
                     for (int i = 0; i < _players.Count; i++)
                     {
-                        //if player hasn't joined
-                        if (!_players[i].GetComponent<CharMovement>().joined)
+                        if (_players[i].activeSelf)
                         {
-                            //set instance inactive if not joined
-                            _players[i].SetActive(false);
-                        }
-                        else
-                        {
-                            playerIconUIElements[i].SetActive(true);                  
+                            //if player hasn't joined
+                            if (!_players[i].GetComponent<CharMovement>().joined)
+                            {
+                                //set instance inactive if not joined
+                                _players[i].SetActive(false);
+                            }
+                            else
+                            {
+                                playerIconUIElements[i].SetActive(true);
+                            }
                         }
                     }
                 }
                 break;
             case GameStates.game:
-                
+
+                //when the overall fill has reached 90 or more
+                if (overAllFill >= 10.0f)
+                {
+                    //set state
+                    m_state = GameStates.gameOver;
+
+                    //change UI
+                    worldCanvas.SetActive(false);
+                    gameOverCanvas.SetActive(true);
+                    menuCanvas.SetActive(false);
+                    uiCanvas.SetActive(false);
+
+                    int winner = 0;
+                    double lastScore = 0;
+                    
+                    foreach (GameObject player in _players)
+                    {
+                        if(player.GetComponent<CharMovement>().joined)
+                        {
+                            if(player.GetComponent<CharMovement>().score > lastScore)
+                            {
+                                lastScore = player.GetComponent<CharMovement>().score;
+                                winner = player.GetComponent<CharMovement>().playerIndex;
+                            }
+                        }
+                    }
+
+                    //set winner text
+                    winnerText.GetComponent<Text>().text = "Player " + winner+1;
+
+
+                }                
                 break;
             case GameStates.paused:
+                break;
+            case GameStates.gameOver:
+
+                if(Input.GetKey(KeyCode.L))
+                {
+                    worldCanvas.SetActive(true);
+                    menuCanvas.SetActive(true);
+                    uiCanvas.SetActive(false);
+                    gameOverCanvas.SetActive(false);
+                    
+                    foreach (GameObject player in _players)
+                    {
+                        if(player.activeSelf)
+                        {
+                            player.GetComponent<CharMovement>().joined = false;
+                        }
+                    }
+
+                }
+
                 break;
             default:
                 break;

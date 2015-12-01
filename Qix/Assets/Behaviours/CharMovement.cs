@@ -38,7 +38,7 @@ public class CharMovement : MonoBehaviour
     private float fuseSpeed = 0.02f;
     private float fuseTimeLastHitNewNode = 0f;
 
-    double score = 0.0f;
+    public double score = 0.0f;
 	
 	//Input enum
 	public enum MoveInput {UP, DOWN, LEFT, RIGHT, NULL};
@@ -659,6 +659,8 @@ public class CharMovement : MonoBehaviour
         Debug.Log(score);
         //set UI component 
         scoreUI.GetComponent<Text>().text = score + "%";
+
+        GameManager.instance.overAllFill += score;
     }
 
     //bool Intersection(float x1, float y1, float x2, float y2, float x3, float y3, float x4, float y4)

@@ -5,5 +5,6 @@ public enum GameStates
 {
     menu, 
     game, 
-    paused
+    paused, 
+    gameOver
 };
