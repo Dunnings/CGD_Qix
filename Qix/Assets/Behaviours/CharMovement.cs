@@ -10,8 +10,8 @@ public class CharMovement : MonoBehaviour
     //Movement Speed
     public float moveSpeed = 1;
     //Construction Path
-    List<Node> constructionPath = new List<Node>();
-    List<Node> constructionPathCorners = new List<Node>();
+    public List<Node> constructionPath = new List<Node>();
+    public List<Node> constructionPathCorners = new List<Node>();
     //Can I move in a direction
     public bool validUp, validDown, validLeft, validRight;
     //Am I alive
@@ -56,6 +56,7 @@ public class CharMovement : MonoBehaviour
     Node previousNode;
 
     public AudioClip fuseSound;
+    public AudioClip fuseExplo;
 
     void Start()
     {
@@ -129,6 +130,7 @@ public class CharMovement : MonoBehaviour
                 for (int i = 0; i < constructionPath.Count; i++)
                 {
                     if(constructionPath[i].state == NodeState.construction) {
+
                         constructionPath[i].state = NodeState.inactive;
                         WorldGenerator.Instance.PaintInactive((int)constructionPath[i].position.x, (int)constructionPath[i].position.y);
                     }
@@ -138,7 +140,12 @@ public class CharMovement : MonoBehaviour
                 fusePathPosition = 0;
             }
 
+            constructionPath.Clear();
+            constructionPathCorners.Clear();
+            GameManager.instance.spawnedPlayers--;
             gameObject.SetActive(false);
+            //decrement amount of spawned players
+            
             return;
         }
 
@@ -332,7 +339,7 @@ public class CharMovement : MonoBehaviour
                             UpdateScore(area);
                         }
                     }
-                                      
+					
                     //clear the path 
                     constructionPath.Clear();
                     constructionPathCorners.Clear();

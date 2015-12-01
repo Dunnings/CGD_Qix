@@ -29,6 +29,74 @@ public class WorldGenerator : MonoBehaviour
 
     public AudioClip completeSound;
     
+    public void Reset()
+    {
+      
+       for (int x = 0; x < mapWidth; x++)
+        {
+            for (int y = 0; y < mapHeight; y++)
+            {
+                if (x == 0 || x == mapWidth - 1)
+                {
+                    grid[x,y].m_node.directions[0] = true;
+                    grid[x, y].m_node.directions[2] = true;
+                    grid[x, y].m_node.state = NodeState.active;
+                }
+                if (y == 0 || y == mapHeight - 1)
+                {
+                    grid[x, y].m_node.directions[1] = true;
+                    grid[x, y].m_node.directions[3] = true;
+                    grid[x, y].m_node.state = NodeState.active;
+                }
+                if (x == 0 && y == 0)
+                {
+                    grid[x, y].m_node.directions[0] = true;
+                    grid[x, y].m_node.directions[1] = true;
+                    grid[x, y].m_node.directions[2] = false;
+                    grid[x, y].m_node.directions[3] = false;
+                }
+                if (x == mapWidth - 1 && y == 0)
+                {
+                    grid[x, y].m_node.directions[0] = true;
+                    grid[x, y].m_node.directions[1] = false;
+                    grid[x, y].m_node.directions[2] = false;
+                    grid[x, y].m_node.directions[3] = true;
+                }
+                if (x == 0 && y == mapHeight - 1)
+                {
+                    grid[x, y].m_node.directions[0] = false;
+                    grid[x, y].m_node.directions[1] = true;
+                    grid[x, y].m_node.directions[2] = true;
+                    grid[x, y].m_node.directions[3] = false;
+                }
+                if (x == mapWidth - 1 && y == mapHeight - 1)
+                {
+                    grid[x, y].m_node.directions[0] = false;
+                    grid[x, y].m_node.directions[1] = false;
+                    grid[x, y].m_node.directions[2] = true;
+                    grid[x, y].m_node.directions[3] = true;
+                }
+                
+            }
+        }
+
+       for (int x = 0; x < mapWidth; x++)
+       {
+           for (int y = 0; y < mapHeight; y++)
+           {
+               if (grid[x, y].m_node.state == NodeState.active)
+               {
+                   DrawTexture(x * 32, (mapHeight - y - 1) * 32, white);
+               }
+               else
+               {
+                   DrawTexture(x * 32, (mapHeight - y - 1) * 32, blank);
+               }
+           }
+
+       }
+    }
+
 	void Awake ()
     {
         Instance = this;
@@ -46,8 +114,9 @@ public class WorldGenerator : MonoBehaviour
                 go.transform.position = new Vector3(x, y, 0f);
                 go.AddComponent<BoxCollider2D>();
                 go.transform.SetParent(parent.transform);
-                go.GetComponent<BoxCollider2D>().isTrigger = true;
+                //go.GetComponent<BoxCollider2D>().isTrigger = true;
                 go.tag = "Node";
+
 				GridElement gridElement = go.GetComponent<GridElement>();
                 //gridElement.name = x + " - " + y;
 
@@ -95,7 +164,6 @@ public class WorldGenerator : MonoBehaviour
                     gridElement.m_node.directions[3] = true;
                 }
                 grid[x, y] = gridElement;
-
             }            
         }
 
@@ -154,15 +222,13 @@ public class WorldGenerator : MonoBehaviour
     public void PaintBurnt(int x, int y)
     {
         y += 1;
-        DrawTexture(x * 32 , (mapHeight - y) * 32 , burntTile);
-        //AudioManager.instance.PlaySingle(completeSound);        
+        DrawTexture(x * 32 , (mapHeight - y) * 32 , burntTile);        
     }
 
     public void PaintInactive(int x, int y)
     {
         y += 1;
-        DrawTexture(x * 32 , (mapHeight - y) * 32 , blank);
-        //AudioManager.instance.PlaySingle(completeSound);        
+        DrawTexture(x * 32 , (mapHeight - y) * 32 , blank);        
     }
 
     int totalTiles = 11250;

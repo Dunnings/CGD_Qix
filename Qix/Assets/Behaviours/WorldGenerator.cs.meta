@@ -1,10 +1,16 @@
 fileFormatVersion: 2
 guid: cd20beadc45cb694d9b6f22f7f56124f
-timeCreated: 1448459731
-licenseType: Pro
+timeCreated: 1448989824
+licenseType: Free
 MonoImporter:
   serializedVersion: 2
-  defaultReferences: []
+  defaultReferences:
+  - renderObject: {instanceID: 0}
+  - blank: {instanceID: 0}
+  - white: {instanceID: 0}
+  - construction: {instanceID: 0}
+  - burntTile: {instanceID: 0}
+  - completeSound: {fileID: 8300000, guid: cf7cade32b9848845a662d6035b23d0e, type: 3}
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 
