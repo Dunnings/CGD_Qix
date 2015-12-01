@@ -114,7 +114,7 @@ public class GameManager : MonoBehaviour
                         if (_players[i].GetComponent<CharMovement>().joined &&
                             playerUIElements[i].GetComponentInChildren<Image>().color != Color.white)
                         {
-                            //AudioManager.instance.PlaySingle(playerJoined);
+                            AudioManager.instance.PlaySingle(playerJoined);
                             //get UI element color
                             Color get = playerUIElements[i].GetComponentInChildren<Image>().color;
                             //turn up alpha
@@ -145,7 +145,7 @@ public class GameManager : MonoBehaviour
                     m_state = GameStates.game;
 
                     //start music
-                    //AudioManager.instance.PlayMusic(music);
+                    AudioManager.instance.PlayMusic(music);
 
                     //loop over all possible players
                     for (int i = 0; i < _players.Count; i++)
