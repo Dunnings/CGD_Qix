@@ -4,15 +4,26 @@ using System.Collections;
 public class QixBehaviour : MonoBehaviour
 {
 	Vector3 destination, desiredScale;
-	float rotTimer, rotation, startMoveTime, journeyDistance, scaleDiff, startScaleTime;
-	bool newDestination, newScale, rotDirection;
+	public Vector3 direction;
+	float dirTimer, rotTimer, rotation, startMoveTime, journeyDistance, scaleDiff, startScaleTime;
+	bool newDirection, newDestination, newScale, rotDirection;
 	
-	public float maxRotTime = 1f, rotSpeed, maxScale = 3f, minScale, speed = 1f, scaleSpeed = 0.1f, gridXUpper, gridXLower, gridYUpper, gridYLower;
+	public float maxDirTime = 1f, maxRotTime = 1f, rotSpeed, maxScale = 3f, minScale, speed = 1f, scaleSpeed = 0.1f, gridXUpper, gridXLower, gridYUpper, gridYLower;
 
 
 	void Start ()
 	{
 		//generate initial destination
+		dirTimer = RandomFloat(0f, maxRotTime);
+
+		Random.seed = (int)System.DateTime.Now.Millisecond;
+
+		int tempDirection = Random.Range(0, 4);
+		
+		SetDirection (tempDirection);
+
+//		direction = new Vector3 (RandomFloat (-1f, 1f), RandomFloat (-1f, 1f), 0f);
+
 		destination = new Vector3 (RandomFloat (gridXLower, gridXUpper), RandomFloat(gridYLower, gridYUpper), 0f);
 		journeyDistance = Vector3.Distance (transform.position, destination);
 		startMoveTime = Time.time;
@@ -36,20 +47,39 @@ public class QixBehaviour : MonoBehaviour
 
 	void Update ()
 	{
-		//if called to designate a new destination, regen a destination
-		if (newDestination)
+		//if called to designate a new direction, regen a destination
+		if (newDirection || (dirTimer <= 0)) 
+		{
+			//if (newDirection)
+			{
+				Random.seed = (int)System.DateTime.Now.Millisecond;
+
+				int tempDirection = Random.Range(0, 4);
+
+				SetDirection (tempDirection);
+
+				dirTimer = Random.Range(0f, maxDirTime);
+			}
+
+			//Random.seed = (int)System.DateTime.Now.Millisecond;
+
+			//direction = new Vector3 (RandomFloat (-1f, 1f), RandomFloat (-1f, 1f), 0f);
+			newDirection = false;
+		}
+
+		/*if (newDestination)
 		{
 			destination = new Vector3 (RandomFloat (gridXLower, gridXUpper), RandomFloat (gridYLower, gridYUpper), 0f);
 			journeyDistance = Vector3.Distance (transform.position, destination);
 			startMoveTime = Time.time;
 			newDestination = false;
-		}
+		}*/
 
 		//if called to designate a new scale, regen a destination
 		if (newScale)
 		{
 			//generate desired scale
-			desiredScale = new Vector3 (RandomFloat (minScale, maxScale), transform.localScale.y, 0f);
+			desiredScale = new Vector3 (RandomFloat (minScale, maxScale), 1f, 1f);
 			scaleDiff = Vector3.Distance (transform.localScale, desiredScale);
 			startScaleTime = Time.time;
 			newScale = false;
@@ -69,13 +99,37 @@ public class QixBehaviour : MonoBehaviour
 			}
 		}
 		//rotate
-		Rotate ();
+		//Rotate ();
 
 		//move
-		ToDestination ();
+
+		MoveDirection ();
+
+		//ToDestination ();
 
 		//scale
-		Scale ();
+		//Scale ();
+
+		transform.rotation = Quaternion.identity;
+	}
+
+
+
+	void LateUpdate ()
+	{
+		int tempX, tempY;
+		tempX = (int) transform.position.x;
+		if ((transform.position.x - tempX) > 0.5f)
+		{
+			tempX++;
+		}
+		tempY = (int) transform.position.y;
+		if ((transform.position.y - tempY) > 0.5f)
+		{
+			tempY++;
+		}
+
+		transform.position = new Vector3 (tempX, tempY, 0f);
 	}
 
 	float RandomFloat (float _min, float _max)
@@ -98,6 +152,17 @@ public class QixBehaviour : MonoBehaviour
 		value = (int) Random.Range (_min, _max);
 		
 		return value;
+	}
+
+	void MoveDirection ()
+	{
+		transform.position += direction * speed;
+
+		dirTimer -= Time.deltaTime;
+
+		if (dirTimer <= 0) {
+			newDirection = true;
+		}
 	}
 
 	void ToDestination ()
@@ -138,12 +203,65 @@ public class QixBehaviour : MonoBehaviour
 		rotTimer -= Time.deltaTime;
 	}
 
-	void OnCollisionEnter (Collision col)
+	void OnCollisionEnter2D (Collision2D col)
 	{
 		//if collision with the player occurs, disable player for now
 		if (col.gameObject.tag == "Player")
 		{
 			col.gameObject.SetActive(false);
+		}
+
+		//change move direction
+		newDestination = true;
+
+		direction *= -1;
+
+
+		if (rotDirection) {
+			rotDirection = false;
+		} else {
+			rotDirection = true;
+		}
+
+	}
+
+	void OnCollisionStay2D (Collision2D col)
+	{
+		//if collision with the player occurs, disable player for now
+		if (col.gameObject.tag == "Player")
+		{
+			col.gameObject.SetActive(false);
+		}
+		
+		//change move direction
+		//newDestination = true;
+		
+		//direction *= -1;
+		
+		
+		if (rotDirection) {
+			rotDirection = false;
+		} else {
+			rotDirection = true;
+		}
+		
+	}
+
+	void SetDirection (int _direction)
+	{
+		switch (_direction) {
+		case 0: //up (0, 1, 0)
+			direction = new Vector3(0, 1, 0);
+			break;
+		case 1: //down (0, -1, 0)
+			direction = new Vector3(0, -1, 0);
+			break;
+		case 2: //left (-1, 0, 0)
+			direction = new Vector3(-1, 0, 0);
+			break;
+		case 3: //right (1, 0, 0)
+			direction = new Vector3(1, 0, 0);
+			break;
 		}
 	}
 

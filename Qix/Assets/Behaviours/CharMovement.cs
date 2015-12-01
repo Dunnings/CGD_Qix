@@ -54,7 +54,7 @@ public class CharMovement : MonoBehaviour
 
     Node currentNode;
 
-    public AudioClip moveSound;
+    public AudioClip fuseSound;
 
     void Start()
     {
@@ -63,7 +63,7 @@ public class CharMovement : MonoBehaviour
 
         fuse.SetActive(false);
 
-		//SetLocation ();
+		SetLocation ();
     }
 
     void HitNode(Node inputNode)
@@ -82,7 +82,6 @@ public class CharMovement : MonoBehaviour
                 WorldGenerator.Instance.PaintConstruction((int)inputNode.position.x, (int)inputNode.position.y, playerIndex);
                 //Add this node to the construction path
                 constructionPath.Add(inputNode);
-
             }
             else
             {
@@ -92,6 +91,14 @@ public class CharMovement : MonoBehaviour
                 validDown = inputNode.directions[2];
                 validLeft = inputNode.directions[3];
             }
+            //if (lastInput == MoveInput.UP || lastInput == MoveInput.DOWN)
+            //{
+            //    transform.position = new Vector3(transform.position.x - (transform.position.x % 0.5f), transform.position.y, 0f);
+            //}
+            //else if(lastInput == MoveInput.LEFT || lastInput == MoveInput.RIGHT)
+            //{
+            //    transform.position = new Vector3(transform.position.x, transform.position.y - (transform.position.y % 0.5f), 0f);
+            //}
         }
     }
 
@@ -385,6 +392,7 @@ public class CharMovement : MonoBehaviour
                         fuse.SetActive(true);
                     }
                     fuse.transform.position = Vector3.Lerp(constructionPath[fusePathPosition].position, constructionPath[fusePathPosition + 1].position, Time.time - fuseTimeLastHitNewNode / fuseSpeed);
+                    AudioManager.instance.RandomizeSfx(fuseSound, fuseSound);
                     if (Time.time - fuseTimeLastHitNewNode > fuseSpeed)
                     {
                         if (fusePathPosition + 2 >= constructionPath.Count)
@@ -422,7 +430,7 @@ public class CharMovement : MonoBehaviour
 	//when the first valid movement is found, it is applied and then will not apply another movement
 	void ApplyMoveInput ()
 	{
-		//SetLocation ();
+		SetLocation ();
 
 		for (int i = 0; i < inputStack.Count; i++)
 		{
@@ -615,33 +623,43 @@ public class CharMovement : MonoBehaviour
         FloodFill(x, y - 1, ref area);   
     }
 
-	//finds where the character is in the grid and then adds
-	//void SetLocation ()
-	//{
-	//	bool notEdgeX = false;
+    //finds where the character is in the grid and then adds
+    void SetLocation()
+    {
+        bool notEdgeX = false;
 
-	//	location.Clear ();
+        location.Clear();
 
-	//	//find where in the grid the player is
-	//	if (currentNode.position.x == 0) {
-	//		location.Add (GridLoc.LEFT);
-	//	} else if (currentNode.position.x == 149) {
-	//		location.Add (GridLoc.RIGHT);
-	//	} else {
-	//		notEdgeX = true;
-	//	}
+        //find where in the grid the player is
+        if (currentNode.position.x == 0)
+        {
+            location.Add(GridLoc.LEFT);
+        }
+        else if (currentNode.position.x == 149)
+        {
+            location.Add(GridLoc.RIGHT);
+        }
+        else
+        {
+            notEdgeX = true;
+        }
 
-	//	if (currentNode.position.y == 1) {
-	//		location.Add (GridLoc.DOWN);
-	//	} else if (currentNode.position.y == 74) {
-	//		location.Add (GridLoc.UP);
-	//	} else {
-	//		if (notEdgeX)
-	//		{
-	//			location.Add(GridLoc.MID);
-	//		}
-	//	}
-	//}
+        if (currentNode.position.y == 1)
+        {
+            location.Add(GridLoc.DOWN);
+        }
+        else if (currentNode.position.y == 74)
+        {
+            location.Add(GridLoc.UP);
+        }
+        else
+        {
+            if (notEdgeX)
+            {
+                location.Add(GridLoc.MID);
+            }
+        }
+    }
 
     /// <summary>
     /// called after an area is filled

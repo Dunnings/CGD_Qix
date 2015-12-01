@@ -1,10 +1,16 @@
 fileFormatVersion: 2
 guid: bba94777cb5ba7443be80af0ad5d3526
-timeCreated: 1448456458
-licenseType: Pro
+timeCreated: 1448974357
+licenseType: Free
 MonoImporter:
   serializedVersion: 2
-  defaultReferences: []
+  defaultReferences:
+  - menuCanvas: {instanceID: 0}
+  - worldCanvas: {instanceID: 0}
+  - uiCanvas: {instanceID: 0}
+  - menuCreditText: {instanceID: 0}
+  - gameCreditText: {instanceID: 0}
+  - music: {fileID: 8300000, guid: d59adccf8980b2044ab015338f2d2944, type: 3}
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 
