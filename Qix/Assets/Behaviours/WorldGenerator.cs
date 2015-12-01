@@ -46,8 +46,9 @@ public class WorldGenerator : MonoBehaviour
                 go.transform.position = new Vector3(x, y, 0f);
                 go.AddComponent<BoxCollider2D>();
                 go.transform.SetParent(parent.transform);
-                go.GetComponent<BoxCollider2D>().isTrigger = true;
+                //go.GetComponent<BoxCollider2D>().isTrigger = true;
                 go.tag = "Node";
+
 				GridElement gridElement = go.GetComponent<GridElement>();
                 //gridElement.name = x + " - " + y;
 

@@ -129,6 +129,7 @@ public class CharMovement : MonoBehaviour
                 for (int i = 0; i < constructionPath.Count; i++)
                 {
                     if(constructionPath[i].state == NodeState.construction) {
+
                         constructionPath[i].state = NodeState.inactive;
                         WorldGenerator.Instance.PaintInactive((int)constructionPath[i].position.x, (int)constructionPath[i].position.y);
                     }
@@ -332,7 +333,7 @@ public class CharMovement : MonoBehaviour
                             UpdateScore(area);
                         }
                     }
-                                      
+					
                     //clear the path 
                     constructionPath.Clear();
                     constructionPathCorners.Clear();
