@@ -203,12 +203,38 @@ public class QixBehaviour : MonoBehaviour
 		rotTimer -= Time.deltaTime;
 	}
 
-	void OnCollisionEnter2D (Collision2D col)
+	void OnTriggerEnter2D (Collider2D col)
 	{
 		//if collision with the player occurs, disable player for now
-		if (col.gameObject.tag == "Player")
-		{
-			col.gameObject.SetActive(false);
+		if (col.gameObject.tag == "Player") {
+
+			col.gameObject.GetComponent<CharMovement>().alive = false;
+
+		} else if (col.gameObject.tag == "Node") {
+
+			if (col.gameObject.GetComponent<GridElement>().m_node.state == NodeState.construction)
+			{
+				//this kills the player
+
+				//find node
+				int seekedPlayerIndex = col.gameObject.GetComponent<GridElement>().m_node.owner;
+				
+				GameObject[] allPlayers = GameObject.FindGameObjectsWithTag("Player");
+					
+				for (int i = 0; i < allPlayers.Length; i++)
+				{
+					if (allPlayers[i].GetComponent<CharMovement>().playerIndex == seekedPlayerIndex)
+					{
+						allPlayers[i].GetComponent<CharMovement>().alive = false;
+						break;
+					}
+				}
+			}
+			//if a blank element, ignore and move on
+			if (col.gameObject.GetComponent<GridElement>().m_node.state == NodeState.inactive)
+			{
+				return;
+			}
 		}
 
 		//change move direction

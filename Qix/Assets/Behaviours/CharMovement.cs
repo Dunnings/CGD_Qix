@@ -130,6 +130,7 @@ public class CharMovement : MonoBehaviour
                 for (int i = 0; i < constructionPath.Count; i++)
                 {
                     if(constructionPath[i].state == NodeState.construction) {
+
                         constructionPath[i].state = NodeState.inactive;
                         WorldGenerator.Instance.PaintInactive((int)constructionPath[i].position.x, (int)constructionPath[i].position.y);
                     }
@@ -333,7 +334,7 @@ public class CharMovement : MonoBehaviour
                             UpdateScore(area);
                         }
                     }
-                                      
+					
                     //clear the path 
                     constructionPath.Clear();
                     constructionPathCorners.Clear();
@@ -489,19 +490,24 @@ public class CharMovement : MonoBehaviour
 			case MoveInput.UP:
 				if (validUp || (constructing && !validUp))
 				{
-                        try {
-                            if (constructing && WorldGenerator.Instance.grid[(int)currentNode.position.x, (int)currentNode.position.y + 2].m_node.state == NodeState.construction)
-                            {
-                                break;
-                            }
-                        }
-                        catch (IndexOutOfRangeException ex)
+                    try {
+                        if (constructing && WorldGenerator.Instance.grid[(int)currentNode.position.x, (int)currentNode.position.y + 2].m_node.state == NodeState.construction)
                         {
-
+                            break;
                         }
+                    }
+                    catch (IndexOutOfRangeException ex)
+                    {
 
-                        //if vertical movement then allow movement
-                        transform.Translate(0, 1 * moveSpeed, 0);
+                    }
+
+                    if(constructing && constructionPath.Count <= 1 && validUp)
+                    {
+                            break;
+                    }
+
+                    //if vertical movement then allow movement
+                    transform.Translate(0, 1 * moveSpeed, 0);
 					validLeft = false;
 					validRight = false;
 					validDown = true;
@@ -534,6 +540,10 @@ public class CharMovement : MonoBehaviour
                         {
 
                         }
+                        if (constructing && constructionPath.Count <= 1 && validDown)
+                        {
+                            break;
+                        }
                         transform.Translate(0, -1 * moveSpeed, 0);
 					validLeft = false;
 					validRight = false;
@@ -565,6 +575,10 @@ public class CharMovement : MonoBehaviour
 
                         }
 
+                        if (constructing && constructionPath.Count <= 1 && validLeft)
+                        {
+                            break;
+                        }
                         transform.Translate(-1 * moveSpeed, 0, 0);
 					validUp = false;
 					validDown = false;
@@ -595,6 +609,10 @@ public class CharMovement : MonoBehaviour
                         catch (IndexOutOfRangeException ex)
                         {
 
+                        }
+                        if (constructing && constructionPath.Count <= 1 && validRight)
+                        {
+                            break;
                         }
 
 

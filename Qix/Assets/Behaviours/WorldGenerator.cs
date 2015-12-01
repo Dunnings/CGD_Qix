@@ -41,7 +41,15 @@ public class WorldGenerator : MonoBehaviour
         {
             for (int y = 0; y < mapHeight; y++)
             {
-				GridElement gridElement =  new GridElement();
+                GameObject go = new GameObject();
+                go.AddComponent<GridElement>();
+                go.transform.position = new Vector3(x, y, 0f);
+                go.AddComponent<BoxCollider2D>();
+                go.transform.SetParent(parent.transform);
+                //go.GetComponent<BoxCollider2D>().isTrigger = true;
+                go.tag = "Node";
+
+				GridElement gridElement = go.GetComponent<GridElement>();
                 //gridElement.name = x + " - " + y;
 
                 gridElement.m_pos = new Vector2(x, y);
