@@ -183,10 +183,25 @@ public class GameManager : MonoBehaviour
                             }
                         }
                     }
+                    winner++;
 
                     //set winner text
-                    winnerText.GetComponent<Text>().text = "Player " + winner+1;
+                    winnerText.GetComponent<Text>().text = "Player " + winner + " Wins!";
 
+                    //for (int i = 0; i < playerUIElements.Count-1; i ++ )
+                    //{
+                    //    if (playerUIElements[i].activeSelf)
+                    //    {
+                    //        get UI element color
+                    //        Color get = playerUIElements[i].GetComponentInChildren<Image>().color;
+                    //        turn up alpha
+                    //        get.a = 0.5f;
+                    //        set UI element to full alpha
+                    //        playerUIElements[i].GetComponentInChildren<Image>().color = get;
+                    //    }
+                    //}
+
+                    
 
                 }                
                 break;
