@@ -169,8 +169,13 @@ public class GameManager : MonoBehaviour
                 break;
             case GameStates.game:
 
+                double score = 0.0f;
+
+            
 
                 overallPrecentText.GetComponent<Text>().text = "%" + overAllFill;
+
+
                 //when the overall fill has reached 90 or more
                 if (overAllFill >= 70.0f)
                 {
