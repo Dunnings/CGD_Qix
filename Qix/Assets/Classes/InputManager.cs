@@ -13,6 +13,7 @@ public static class InputManager
 
     public static void GetControllers()
     {
+        _indexOfControllers.Clear();
         //get index of connected controllers
         if (!playerIndexSet || !prevState.IsConnected)
         {

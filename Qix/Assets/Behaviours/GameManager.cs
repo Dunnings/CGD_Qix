@@ -26,6 +26,7 @@ public class GameManager : MonoBehaviour
     public GameObject menuCreditText;
     public GameObject gameCreditText;
     public GameObject winnerText;
+    public GameObject overallPrecentText;
 
     private string creditsString = "CREDITS";
     private int creditsInt = 64;
@@ -168,6 +169,8 @@ public class GameManager : MonoBehaviour
                 break;
             case GameStates.game:
 
+
+                overallPrecentText.GetComponent<Text>().text = "%" + overAllFill;
                 //when the overall fill has reached 90 or more
                 if (overAllFill >= 70.0f)
                 {
@@ -246,50 +249,50 @@ public class GameManager : MonoBehaviour
                 overAllFill = 0;
                 if(Input.GetKeyUp(KeyCode.L))
                 {
-                   
+                    Application.LoadLevel("Main");
 
-                    worldCanvas.SetActive(false);
-                    menuCanvas.SetActive(true);
-                    uiCanvas.SetActive(false);
-                    gameOverCanvas.SetActive(false);
-
-
-                    SetUpPlayers();
-                    for (int i = 0; i < playerUIElements.Count - 1; i++)
-                    {
-                        //turn all joined player c
-                        if (playerUIElements[i].activeSelf)
-                        {
-                            //get UI element color
-                            Color get = playerUIElements[i].GetComponentInChildren<Image>().color;
-                            //turn up alpha
-                            get.a = 0.5f;
-                            //set UI element to full alpha
-                            playerUIElements[i].GetComponentInChildren<Image>().color = get;
-                        }
-                    }
-                    foreach (GameObject player in _players)
-                    {
-                        if (player.GetComponent<CharMovement>().joined)
-                        {
-                            player.GetComponent<CharMovement>().alive = true;
-                            player.GetComponent<CharMovement>().score = 0;
-                            player.transform.position = new Vector2(0.0f, 0.0f);
-                            player.GetComponent<CharMovement>().joined = false;
-                            player.GetComponent<CharMovement>().constructionPath.Clear();
-                            player.GetComponent<CharMovement>().constructionPathCorners.Clear();
-                        }
-
-                        //player.SetActive(false);
-                    }
+                    //worldCanvas.SetActive(false);
+                    //menuCanvas.SetActive(true);
+                    //uiCanvas.SetActive(false);
+                    //gameOverCanvas.SetActive(false);
 
 
-                    creditsInt = 64;
-                    menuCreditText.GetComponent<Text>().text = creditsString + "\n" + creditsInt;
-                    gameCreditText.GetComponent<Text>().text = creditsString + "\n" + creditsInt;
+                    //SetUpPlayers();
+                    //for (int i = 0; i < playerUIElements.Count - 1; i++)
+                    //{
+                    //    //turn all joined player c
+                    //    if (playerUIElements[i].activeSelf)
+                    //    {
+                    //        //get UI element color
+                    //        Color get = playerUIElements[i].GetComponentInChildren<Image>().color;
+                    //        //turn up alpha
+                    //        get.a = 0.5f;
+                    //        //set UI element to full alpha
+                    //        playerUIElements[i].GetComponentInChildren<Image>().color = get;
+                    //    }
+                    //}
+                    //foreach (GameObject player in _players)
+                    //{
+                    //    if (player.GetComponent<CharMovement>().joined)
+                    //    {
+                    //        player.GetComponent<CharMovement>().alive = true;
+                    //        player.GetComponent<CharMovement>().score = 0;
+                    //        player.transform.position = new Vector2(0.0f, 0.0f);
+                    //        player.GetComponent<CharMovement>().joined = false;
+                    //        player.GetComponent<CharMovement>().constructionPath.Clear();
+                    //        player.GetComponent<CharMovement>().constructionPathCorners.Clear();
+                    //    }
+
+                    //    //player.SetActive(false);
+                    //}
+
+
+                    //creditsInt = 64;
+                    //menuCreditText.GetComponent<Text>().text = creditsString + "\n" + creditsInt;
+                    //gameCreditText.GetComponent<Text>().text = creditsString + "\n" + creditsInt;
                     
-                    WorldGenerator.Instance.Reset();
-                    m_state = GameStates.menu;
+                    //WorldGenerator.Instance.Reset();
+                    //m_state = GameStates.menu;
 
                 }
 
