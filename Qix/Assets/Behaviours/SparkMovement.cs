@@ -124,7 +124,10 @@ public class SparkMovement : MonoBehaviour
                     if (validUp)
                     {
                         //if vertical movement then allow movement
-                        transform.Translate(0, 1 * moveSpeed, 0);
+                        if (transform.position.y <= 73 - moveSpeed)
+                        {
+                            transform.Translate(0, 1 * moveSpeed, 0);
+                        }
                         validLeft = false;
                         validRight = false;
                         validDown = false;
@@ -135,7 +138,10 @@ public class SparkMovement : MonoBehaviour
                 case MoveInput.DOWN:
                     if (validDown)
                     {
-                        transform.Translate(0, -1 * moveSpeed, 0);
+                        if (transform.position.y >= 1 * moveSpeed)
+                        {
+                            transform.Translate(0, -1 * moveSpeed, 0);
+                        }
                         validLeft = false;
                         validRight = false;
                         validUp = false;
@@ -148,7 +154,10 @@ public class SparkMovement : MonoBehaviour
                 case MoveInput.LEFT:
                     if (validLeft)
                     {
-                        transform.Translate(-1 * moveSpeed, 0, 0);
+                        if (transform.position.x >= 1 * moveSpeed)
+                        {
+                            transform.Translate(-1 * moveSpeed, 0, 0);
+                        }
                         validUp = false;
                         validDown = false;
                         validRight = false;
@@ -161,7 +170,10 @@ public class SparkMovement : MonoBehaviour
                 case MoveInput.RIGHT:
                     if (validRight)
                     {
-                        transform.Translate(1 * moveSpeed, 0, 0);
+                        if (transform.position.x < 149f - (1 * moveSpeed))
+                        {
+                            transform.Translate(1 * moveSpeed, 0, 0);
+                        }
                         validUp = false;
                         validDown = false;
                         validLeft = false;
