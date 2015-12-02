@@ -819,6 +819,7 @@ public class CharMovement : MonoBehaviour
     /// <param name="areaFilled"></param>
     void UpdateScore(int areaFilled)
     {
+        double pastScore = score;
         //calc percentage
         double result = ((double)areaFilled / 11250) * 100;
         //round to 0 decimal places 
@@ -826,11 +827,15 @@ public class CharMovement : MonoBehaviour
         //increment overall score counter
         score += result;
 
-        Debug.Log(score);
+        //Debug.Log("Player: "+score);
+        //Debug.Log("Overall: " +GameManager.instance.overAllFill);
         //set UI component 
         scoreUI.GetComponent<Text>().text = score + "%";
 
-        GameManager.instance.overAllFill += score;
+        if (score > pastScore)
+        {
+            GameManager.instance.overAllFill += score;
+        }
     }
 
     //bool Intersection(float x1, float y1, float x2, float y2, float x3, float y3, float x4, float y4)
