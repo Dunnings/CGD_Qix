@@ -754,6 +754,16 @@ public class CharMovement : MonoBehaviour
             return;
         }
 
+        for (int i = 0; i < GameManager.instance._players.Count; i++)
+        {
+            if (GameManager.instance._players[i].activeSelf) {
+                if(GameManager.instance._players[i].GetComponent<CharMovement>().currentNode.position.x == x && GameManager.instance._players[i].GetComponent<CharMovement>().currentNode.position.y == y)
+                {
+                    GameManager.instance._players[i].GetComponent<CharMovement>().alive = false;
+                }
+            }
+        }
+
         WorldGenerator.Instance.grid[x, y].m_node.state = NodeState.active;
 
         WorldGenerator.Instance.PaintActive(x, y, playerIndex);
