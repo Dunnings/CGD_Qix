@@ -61,7 +61,7 @@ public class CharMovement : MonoBehaviour
     void Start()
     {
         //Hit node start position
-        HitNode(WorldGenerator.Instance.grid[0, 0].m_node);
+        HitNode(WorldGenerator.Instance.grid[(int)transform.position.x, (int)transform.position.y].m_node);
 
         fuse.SetActive(false);
 

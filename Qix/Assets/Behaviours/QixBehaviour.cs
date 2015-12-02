@@ -111,7 +111,23 @@ public class QixBehaviour : MonoBehaviour
 		//Scale ();
 
 		transform.rotation = Quaternion.identity;
-	}
+        if (transform.position.x < 0f)
+        {
+            transform.position = new Vector3(0f, transform.position.y, transform.position.z);
+        }
+        if (transform.position.x > 130f)
+        {
+            transform.position = new Vector3(130f, transform.position.y, transform.position.z);
+        }
+        if (transform.position.y < 0f)
+        {
+            transform.position = new Vector3(transform.position.x, 0f, transform.position.z);
+        }
+        if (transform.position.y > 64f)
+        {
+            transform.position = new Vector3(transform.position.x, 64f, transform.position.z);
+        }
+    }
 
 
 
